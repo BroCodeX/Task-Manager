@@ -1,0 +1,62 @@
+import com.adarshr.gradle.testlogger.theme.ThemeType
+
+plugins {
+	`java-library`
+	java
+	id("org.springframework.boot") version "3.3.5-SNAPSHOT"
+	id("io.spring.dependency-management") version "1.1.6"
+	id("checkstyle")
+	jacoco
+	id("com.github.johnrengelman.shadow") version "8.1.1"
+	id("com.adarshr.test-logger") version "4.0.0"
+}
+
+group = "hexlet.code"
+version = "0.0.1-SNAPSHOT"
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom(configurations.annotationProcessor.get())
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven { url = uri("https://repo.spring.io/snapshot") }
+}
+
+dependencies {
+	testImplementation(platform("org.junit:junit-bom:5.10.0"))
+	testImplementation("org.junit.jupiter:junit-jupiter")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation("org.assertj:assertj-core:3.26.3")
+
+	implementation("org.apache.commons:commons-lang3:3.14.0")
+	implementation("org.apache.commons:commons-collections4:4.4")
+	implementation("com.puppycrawl.tools:checkstyle:10.17.0")
+
+	implementation("org.slf4j:slf4j-simple:2.0.16")
+
+	implementation("org.postgresql:postgresql:42.7.3")
+
+	implementation("org.springframework.boot:spring-boot-starter")
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.withType<Test> {
+	useJUnitPlatform()
+}
+
+testlogger {
+	showFullStackTraces = true
+	theme = ThemeType.MOCHA
+}
