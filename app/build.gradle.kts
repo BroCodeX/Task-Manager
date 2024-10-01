@@ -10,6 +10,7 @@ plugins {
 	id("com.github.johnrengelman.shadow") version "8.1.1"
 	id("com.adarshr.test-logger") version "4.0.0"
 	id("io.freefair.lombok") version "8.4"
+	application
 }
 
 group = "hexlet.code"
@@ -66,4 +67,8 @@ tasks.jacocoTestReport {
 	reports {
 		xml.required = true
 	}
+}
+
+application {
+	mainClass.set("hexlet.code.app")
 }
