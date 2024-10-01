@@ -1,7 +1,4 @@
-### Hexlet tests and linter status:
-
-
-### A Task's Manager:
+### A Task's Manager on Spring Boot:
 [![Actions Status](https://github.com/BroCodeX/java-project-99/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/BroCodeX/java-project-99/actions)
 [![Main-CI](https://github.com/BroCodeX/java-project-99/actions/workflows/main-CI.yml/badge.svg)](https://github.com/BroCodeX/java-project-99/actions/workflows/main-CI.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/13157a591986285d2ed3/maintainability)](https://codeclimate.com/github/BroCodeX/java-project-99/maintainability)
