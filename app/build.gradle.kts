@@ -60,3 +60,10 @@ testlogger {
 	showFullStackTraces = true
 	theme = ThemeType.MOCHA
 }
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.withType<Test>()) // tests are required to run before generating the report
+	reports {
+		xml.required = true
+	}
+}
