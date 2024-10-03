@@ -27,25 +27,25 @@ public class UserController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> index() {
-
+        return userService.getAll();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable long id) {
-
+        return userService.show(id);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@RequestBody UserCreateDTO dto) {
-
+        return userService.create(dto);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@RequestBody UserUpdateDTO dto, @PathVariable long id) {
-
+        return userService.update(dto, id);
     }
 
     @DeleteMapping("/{id}")
