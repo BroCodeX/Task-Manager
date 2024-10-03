@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -48,7 +49,6 @@ class AppApplicationTests {
 	void prepare() {
 		user = generator.getUserModel();
 		users = generator.getUsersModel();
-
 	}
 
 //	@Test
@@ -56,7 +56,19 @@ class AppApplicationTests {
 //	}
 
 	@Test
-	void index() throws Exception {
+	void showTest() throws Exception {
+
+	}
+
+	@Test
+	void hexletInitTest() {
+		var maybeHexletUser = userRepository.findByEmail("hexlet@example.com").orElse(null);
+		assertThat(maybeHexletUser).isNotNull();
+		assertEquals("hexlet@example.com", maybeHexletUser.getEmail());
+	}
+
+	@Test
+	void indexTest() throws Exception {
 		users.forEach(userRepository::save);
 
 		var request = get("/api/users");
@@ -69,7 +81,7 @@ class AppApplicationTests {
 	}
 
 	@Test
-	void create() throws Exception {
+	void createTest() throws Exception {
 		Map<String, String> refData = new HashMap<>();
 		refData.put("email", "yandextestcreate@test.com");
 		refData.put("firstName", "yandexfirstName@test.com");
@@ -94,7 +106,7 @@ class AppApplicationTests {
 	}
 
 	@Test
-	void update() throws Exception {
+	void updateTest() throws Exception {
 		userRepository.save(user);
 		long id  = user.getId();
 		Map<String, String> refData = new HashMap<>();
@@ -118,7 +130,7 @@ class AppApplicationTests {
 	}
 
 	@Test
-	void destroy() throws Exception {
+	void destroyTest() throws Exception {
 		userRepository.save(user);
 		long id = user.getId();
 

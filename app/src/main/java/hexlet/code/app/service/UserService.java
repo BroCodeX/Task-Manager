@@ -5,7 +5,9 @@ import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import hexlet.code.app.dto.UserDTO;
 
@@ -18,6 +20,9 @@ public class UserService {
 
     @Autowired
     private UserMapper mapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<UserDTO> getAll() {
         return userRepository.findAll().stream()
@@ -34,7 +39,9 @@ public class UserService {
 
 
     public UserDTO create(UserCreateDTO dto) {
+        var encodedPass = passwordEncoder.encode(dto.getPassword());
         var user = mapper.map(dto);
+        user.setPassword(encodedPass);
         userRepository.save(user);
         return mapper.map(user);
     }
@@ -43,6 +50,10 @@ public class UserService {
     public UserDTO update(UserUpdateDTO dto, long id) {
         var maybeUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This " + id + " not found"));
+        if (dto.getPassword().isPresent()) {
+            var encodedPass = passwordEncoder.encode(dto.getPassword().get());
+            dto.setPassword(JsonNullable.of(encodedPass));
+        }
         mapper.update(dto, maybeUser);
         userRepository.save(maybeUser);
         return mapper.map(maybeUser);
