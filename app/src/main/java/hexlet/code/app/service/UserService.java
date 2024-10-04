@@ -1,5 +1,6 @@
 package hexlet.code.app.service;
 
+import hexlet.code.app.dto.AuthDTO;
 import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundExcepiton;
@@ -50,10 +51,10 @@ public class UserService {
     public UserDTO update(UserUpdateDTO dto, long id) {
         var maybeUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " is not found"));
-//        if (dto.getPassword() != null && dto.getPassword().isPresent()) {
-//            var encodedPass = passwordEncoder.encode(dto.getPassword().get());
-//            dto.setPassword(JsonNullable.of(encodedPass));
-//        }
+        if (dto.getPassword() != null && dto.getPassword().isPresent()) {
+            var encodedPass = passwordEncoder.encode(dto.getPassword().get());
+            dto.setPassword(JsonNullable.of(encodedPass));
+        }
         mapper.update(dto, maybeUser);
         userRepository.save(maybeUser);
         return mapper.map(maybeUser);
@@ -62,5 +63,9 @@ public class UserService {
 
     public void destroy(long id) {
         userRepository.deleteById(id);
+    }
+
+    public String login(AuthDTO dto) {
+        return "";
     }
 }

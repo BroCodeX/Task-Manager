@@ -1,5 +1,6 @@
 package hexlet.code.app.controller;
 
+import hexlet.code.app.dto.AuthDTO;
 import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.dto.UserDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api")
 public class UserController {
     @Autowired
     private UserRepository userRepository;
@@ -25,33 +26,38 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("")
+    @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> index() {
         return userService.getAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable long id) {
         return userService.show(id);
     }
 
-    @PostMapping("")
+    @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO dto) {
         return userService.create(dto);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@Valid @RequestBody UserUpdateDTO dto, @PathVariable long id) {
         return userService.update(dto, id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable long id) {
         userService.destroy(id);
+    }
+
+    @PostMapping("/login")
+    public String authentification(@Valid @RequestBody AuthDTO dto) {
+        return userService.login(dto);
     }
 }
