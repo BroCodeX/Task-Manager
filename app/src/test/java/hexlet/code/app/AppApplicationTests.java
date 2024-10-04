@@ -1,6 +1,5 @@
 package hexlet.code.app;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
@@ -10,18 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,23 +45,27 @@ class AppApplicationTests {
 	void prepare() {
 		user = generator.getUserModel();
 		users = generator.getUsersModel();
+		userRepository.deleteAll();
 	}
-
-//	@Test
-//	void contextLoads() {
-//	}
 
 	@Test
 	void showTest() throws Exception {
+		var savedUser = userRepository.save(user);
+		long id  = savedUser.getId();
 
-	}
+		var request = get("/api/users/{id}", id);
+		var response = mockMvc.perform(request)
+				.andExpect(status().isOk())
+				.andReturn();
+		var body = response.getResponse().getContentAsString();
+		var testUser = userRepository.findById(id);
 
-	@Test
-	void hexletInitTest() {
-		var maybeHexletUser = userRepository.findByEmail("hexlet@example.com").orElse(null);
-		assertThat(maybeHexletUser).isNotNull();
-		assertEquals("hexlet@example.com", maybeHexletUser.getEmail());
-        assertNotEquals("qwerty", maybeHexletUser.getPassword());
+		assertThat(testUser).isNotNull();
+		assertThatJson(body).and(
+				n -> n.node("email").isEqualTo(user.getEmail()),
+				n -> n.node("firstName").isEqualTo(user.getFirstName()),
+				n -> n.node("lastName").isEqualTo(user.getLastName())
+		);
 	}
 
 	@Test
@@ -96,9 +96,9 @@ class AppApplicationTests {
 				.andExpect(status().isCreated())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
-		var user = userRepository.findByEmail(refData.get("email")).orElse(null);
+		var testUser = userRepository.findByEmail(refData.get("email")).orElse(null);
 
-		assertThat(user).isNotNull();
+		assertThat(testUser).isNotNull();
 		assertThatJson(body).and(
 				n -> n.node("email").isEqualTo("yandextestcreate@test.com"),
 				n -> n.node("firstName").isEqualTo("yandexfirstName@test.com"),
@@ -108,8 +108,9 @@ class AppApplicationTests {
 
 	@Test
 	void updateTest() throws Exception {
-		userRepository.save(user);
-		long id  = user.getId();
+		var savedUser = userRepository.save(user);
+		long id  = savedUser.getId();
+
 		Map<String, String> refData = new HashMap<>();
 		refData.put("email", "yandextestupdate@test.com");
 		refData.put("lastName", "yandexlastName@test.com");
@@ -127,13 +128,12 @@ class AppApplicationTests {
 				n -> n.node("lastName").isEqualTo("yandexlastName@test.com")
 		);
 		assertThat(userRepository.findById(id).get().getEmail()).isEqualTo(refData.get("email"));
-
 	}
 
 	@Test
 	void destroyTest() throws Exception {
-		userRepository.save(user);
-		long id = user.getId();
+		var savedUser = userRepository.save(user);
+		long id  = savedUser.getId();
 
 		var request = delete("/api/users/{id}", id);
 		mockMvc.perform(request)

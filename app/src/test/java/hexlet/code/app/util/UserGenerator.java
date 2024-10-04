@@ -7,6 +7,7 @@ import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.instancio.Select;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,6 +23,9 @@ public class UserGenerator {
     @Autowired
     private Faker faker;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostConstruct
     public void initData() {
         userModel =  makeFakeUser();
@@ -36,6 +40,7 @@ public class UserGenerator {
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .supply(Select.field(User::getFirstName), () -> faker.name().firstName())
                 .supply(Select.field(User::getLastName), () -> faker.name().lastName())
+                .supply(Select.field(User::getPassword), () -> passwordEncoder.encode("password"))
                 .create();
     }
 }
