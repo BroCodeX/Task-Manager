@@ -1,5 +1,6 @@
 package hexlet.code.app.util;
 
+import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,5 +19,11 @@ public class UserUtils {
         }
         var email = authentication.getName();
         return userRepository.findByEmail(email).get();
+    }
+
+    public boolean isOwner(Long id, String email) {
+        var maybeUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " not found"));
+        return maybeUser.getEmail().equals(email);
     }
 }
