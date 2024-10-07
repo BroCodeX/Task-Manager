@@ -1,13 +1,11 @@
 package hexlet.code.app.controller.api;
 
-import hexlet.code.app.dto.AuthDTO;
 import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.dto.UserDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.service.UserService;
-import hexlet.code.app.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,9 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class UserController {
-
-    @Autowired
-    private UserUtils utils;
 
     @Autowired
     private UserRepository userRepository;
@@ -41,8 +36,8 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    @PreAuthorize("isAuthenticated() and @utils.isOwner(#id, authentication.principal.email)")
-    @PostAuthorize("returnObject.email == authentication.principal.email")
+    @PreAuthorize("isAuthenticated() and @userService.isOwner(#id, authentication.principal.getClaim('sub'))")
+    @PostAuthorize("returnObject.email == authentication.principal.getClaim('sub')")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable long id) {
         return userService.show(id);
@@ -55,14 +50,14 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
-    @PreAuthorize("isAuthenticated() and #dto.email == authentication.principal.email")
+    @PreAuthorize("isAuthenticated() and #dto.email == authentication.principal.getClaim('sub')")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@Valid @RequestBody UserUpdateDTO dto, @PathVariable long id) {
         return userService.update(dto, id);
     }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("isAuthenticated() and @utils.isOwner(#id, authentication.principal.email)")
+    @PreAuthorize("isAuthenticated() and @userService.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable long id) {
         userService.destroy(id);

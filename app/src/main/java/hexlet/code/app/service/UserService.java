@@ -62,4 +62,10 @@ public class UserService {
     public void destroy(long id) {
         userRepository.deleteById(id);
     }
+
+    public boolean isOwner(Long id, String email) {
+        var maybeUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " not found"));
+        return maybeUser.getEmail().equals(email);
+    }
 }
