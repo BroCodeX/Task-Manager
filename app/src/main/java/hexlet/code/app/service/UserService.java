@@ -6,8 +6,11 @@ import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
+import hexlet.code.app.util.JWTUtils;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import hexlet.code.app.dto.UserDTO;
@@ -25,6 +28,12 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JWTUtils jwtUtils;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     public List<UserDTO> getAll() {
         return userRepository.findAll().stream()
                 .map(mapper::map)
@@ -40,9 +49,9 @@ public class UserService {
 
 
     public UserDTO create(UserCreateDTO dto) {
-        var encodedPass = passwordEncoder.encode(dto.getPassword());
+        var hashedPass = passwordEncoder.encode(dto.getPassword());
         var user = mapper.map(dto);
-        user.setPassword(encodedPass);
+        user.setPassword(hashedPass);
         userRepository.save(user);
         return mapper.map(user);
     }
@@ -52,8 +61,8 @@ public class UserService {
         var maybeUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " is not found"));
         if (dto.getPassword() != null && dto.getPassword().isPresent()) {
-            var encodedPass = passwordEncoder.encode(dto.getPassword().get());
-            dto.setPassword(JsonNullable.of(encodedPass));
+            var hashedPass = passwordEncoder.encode(dto.getPassword().get());
+            dto.setPassword(JsonNullable.of(hashedPass));
         }
         mapper.update(dto, maybeUser);
         userRepository.save(maybeUser);
@@ -65,7 +74,10 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public String login(AuthDTO dto) {
-        return "";
+    public String login(AuthDTO dtoAuth) {
+        var authentification = new UsernamePasswordAuthenticationToken(dtoAuth.getEmail(), dtoAuth.getPassword());
+        authenticationManager.authenticate(authentification);
+        var token = jwtUtils.generateToken(dtoAuth.getEmail());
+        return token;
     }
 }

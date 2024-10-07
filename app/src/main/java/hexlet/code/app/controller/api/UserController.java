@@ -1,4 +1,4 @@
-package hexlet.code.app.controller;
+package hexlet.code.app.controller.api;
 
 import hexlet.code.app.dto.AuthDTO;
 import hexlet.code.app.dto.UserCreateDTO;
@@ -54,10 +54,5 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable long id) {
         userService.destroy(id);
-    }
-
-    @PostMapping("/login")
-    public String authentification(@Valid @RequestBody AuthDTO dto) {
-        return userService.login(dto);
     }
 }
