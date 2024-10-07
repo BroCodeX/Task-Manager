@@ -1,16 +1,12 @@
 package hexlet.code.app.service;
 
-import hexlet.code.app.dto.AuthDTO;
 import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
-import hexlet.code.app.util.JWTUtils;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import hexlet.code.app.dto.UserDTO;
@@ -27,12 +23,6 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JWTUtils jwtUtils;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     public List<UserDTO> getAll() {
         return userRepository.findAll().stream()
@@ -69,15 +59,7 @@ public class UserService {
         return mapper.map(maybeUser);
     }
 
-
     public void destroy(long id) {
         userRepository.deleteById(id);
-    }
-
-    public String login(AuthDTO dtoAuth) {
-        var authentification = new UsernamePasswordAuthenticationToken(dtoAuth.getEmail(), dtoAuth.getPassword());
-        authenticationManager.authenticate(authentification);
-        var token = jwtUtils.generateToken(dtoAuth.getEmail());
-        return token;
     }
 }
