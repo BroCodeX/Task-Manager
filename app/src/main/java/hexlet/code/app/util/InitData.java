@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InitAppData implements ApplicationRunner {
+public class InitData implements ApplicationRunner {
 
     @Autowired
     private UserRepository userRepository;
