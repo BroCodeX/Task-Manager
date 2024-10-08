@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 public class AuthDTO {
     @NotBlank
-    private String username;
+    private String email;
 
     @NotNull
     @Size(min = 3)

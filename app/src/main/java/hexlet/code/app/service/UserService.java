@@ -1,6 +1,5 @@
 package hexlet.code.app.service;
 
-import hexlet.code.app.dto.AuthDTO;
 import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundExcepiton;
@@ -40,9 +39,9 @@ public class UserService {
 
 
     public UserDTO create(UserCreateDTO dto) {
-        var encodedPass = passwordEncoder.encode(dto.getPassword());
+        var hashedPass = passwordEncoder.encode(dto.getPassword());
         var user = mapper.map(dto);
-        user.setPassword(encodedPass);
+        user.setPassword(hashedPass);
         userRepository.save(user);
         return mapper.map(user);
     }
@@ -52,20 +51,21 @@ public class UserService {
         var maybeUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " is not found"));
         if (dto.getPassword() != null && dto.getPassword().isPresent()) {
-            var encodedPass = passwordEncoder.encode(dto.getPassword().get());
-            dto.setPassword(JsonNullable.of(encodedPass));
+            var hashedPass = passwordEncoder.encode(dto.getPassword().get());
+            dto.setPassword(JsonNullable.of(hashedPass));
         }
         mapper.update(dto, maybeUser);
         userRepository.save(maybeUser);
         return mapper.map(maybeUser);
     }
 
-
     public void destroy(long id) {
         userRepository.deleteById(id);
     }
 
-    public String login(AuthDTO dto) {
-        return "";
+    public boolean isOwner(Long id, String email) {
+        var maybeUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " not found"));
+        return maybeUser.getEmail().equals(email);
     }
 }

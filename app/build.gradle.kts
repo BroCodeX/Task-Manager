@@ -60,6 +60,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("jakarta.validation:jakarta.validation-api")
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
 	// Mapper
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")

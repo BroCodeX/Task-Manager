@@ -1,4 +1,4 @@
-package hexlet.code.app.component;
+package hexlet.code.app.util;
 
 import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.mapper.UserMapper;
@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InitAppData implements ApplicationRunner {
+public class InitData implements ApplicationRunner {
 
     @Autowired
     private UserRepository userRepository;
@@ -29,9 +29,9 @@ public class InitAppData implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         UserCreateDTO dto = new UserCreateDTO();
         dto.setEmail("hexlet@example.com");
-        dto.setPassword(passwordEncoder.encode("qwerty"));
+        dto.setPassword("qwerty");
         userService.create(dto);
         var hexletUser = userRepository.findByEmail("hexlet@example.com").get();
-        System.out.println("Init user " + hexletUser.toString() + " created");
+        System.out.println("Init user " + hexletUser + " created");
     }
 }
