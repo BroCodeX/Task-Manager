@@ -29,15 +29,11 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<Page<UserDTO>> getAll(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<User> userPage = userRepository.findAll(pageRequest);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(userPage.getTotalElements()));
-        Page<UserDTO> result = userPage.map(mapper::map);
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(result);
+    public List<UserDTO> getAll(int limit) {
+        return userRepository.findAll().stream()
+                .limit(limit)
+                .map(mapper::map)
+                .toList();
     }
 
 
