@@ -8,7 +8,9 @@ import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +33,9 @@ public class UserController {
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
-    public List<UserDTO> index() {
-        return userService.getAll();
+    public ResponseEntity<Page<UserDTO>> index(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return userService.getAll(page, size);
     }
 
     @GetMapping("/users/{id}")
@@ -44,6 +47,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
+    @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO dto) {
         return userService.create(dto);

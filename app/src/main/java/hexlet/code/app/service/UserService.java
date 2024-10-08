@@ -4,9 +4,14 @@ import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.mapper.UserMapper;
+import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import hexlet.code.app.dto.UserDTO;
@@ -24,10 +29,15 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public List<UserDTO> getAll() {
-        return userRepository.findAll().stream()
-                .map(mapper::map)
-                .toList();
+    public ResponseEntity<Page<UserDTO>> getAll(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<User> userPage = userRepository.findAll(pageRequest);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(userPage.getTotalElements()));
+        Page<UserDTO> result = userPage.map(mapper::map);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(result);
     }
 
 
