@@ -59,7 +59,7 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
-    @PreAuthorize("isAuthenticated() and #dto.email == authentication.principal.getClaim('sub')")
+    @PreAuthorize("isAuthenticated() and @userService.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@Valid @RequestBody UserUpdateDTO dto, @PathVariable long id) {
         return userService.update(dto, id);
