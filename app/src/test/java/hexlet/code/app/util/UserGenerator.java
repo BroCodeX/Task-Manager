@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.instancio.Model;
 import org.instancio.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,8 +18,8 @@ import java.util.stream.IntStream;
 @Component
 @Getter
 public class UserGenerator {
-    private User userModel;
-    private List<User> usersModel;
+    private Model<User> userModel;
+    private List<Model<User>> usersModel;
 
     @Autowired
     private Faker faker;
@@ -29,18 +30,18 @@ public class UserGenerator {
     @PostConstruct
     public void initData() {
         userModel =  makeFakeUser();
-        usersModel = IntStream.range(0, 10)
+        usersModel = IntStream.range(0, 6)
                 .mapToObj(i -> makeFakeUser())
                 .collect(Collectors.toList());
     }
 
-    public User makeFakeUser() {
+    public Model<User> makeFakeUser() {
         return Instancio.of(User.class)
                 .ignore(Select.field(User::getId))
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .supply(Select.field(User::getFirstName), () -> faker.name().firstName())
                 .supply(Select.field(User::getLastName), () -> faker.name().lastName())
                 .supply(Select.field(User::getPassword), () -> passwordEncoder.encode("password"))
-                .create();
+                .toModel();
     }
 }
