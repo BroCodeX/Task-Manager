@@ -19,7 +19,11 @@ server:
 
 logging:
   level:
-    root: INFO
+    root: DEBUG
+    org:
+      springframework:
+        # web: DEBUG
+        security: DEBUG
 
 rsa:
   private-key: classpath:certs/private.pem

@@ -17,9 +17,9 @@ public class UserAuthService {
     private JWTUtils jwtUtils;
 
     public String login(AuthDTO dtoAuth) {
-        var authentification = new UsernamePasswordAuthenticationToken(dtoAuth.getEmail(), dtoAuth.getPassword());
+        var authentification = new UsernamePasswordAuthenticationToken(dtoAuth.getUsername(), dtoAuth.getPassword());
         authenticationManager.authenticate(authentification);
-        var token = jwtUtils.generateToken(dtoAuth.getEmail());
+        var token = jwtUtils.generateToken(dtoAuth.getUsername());
         return token;
     }
 }

@@ -1,17 +1,22 @@
 package hexlet.code.app.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
+import java.time.format.DateTimeFormatter;
 
 @Configuration
 public class JacksonConfig {
     @Bean
     Jackson2ObjectMapperBuilder objectMapperBuilder() {
         var builder = new Jackson2ObjectMapperBuilder();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         builder.serializationInclusion(JsonInclude.Include.NON_NULL)
+                .serializers(new LocalDateSerializer(formatter))
                 .modulesToInstall(new JsonNullableModule());
         return builder;
     }
