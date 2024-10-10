@@ -4,6 +4,7 @@ import hexlet.code.app.dto.StatusCreateDTO;
 import hexlet.code.app.dto.StatusDTO;
 import hexlet.code.app.dto.StatusUpdateDTO;
 import hexlet.code.app.service.StatusService;
+import hexlet.code.app.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -21,8 +22,11 @@ public class StatusController {
     @Autowired
     private StatusService service;
 
+    @Autowired
+    private UserUtils userUtils;
+
     @GetMapping("")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<StatusDTO>> index(@RequestParam(defaultValue = "10") Integer limit) {
         List<StatusDTO> statusDTOS = service.getAll(limit);
@@ -34,28 +38,28 @@ public class StatusController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public StatusDTO show(@PathVariable long id) {
         return service.show(id);
     }
 
     @PostMapping("")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.CREATED)
     public StatusDTO create(@Valid @RequestBody StatusCreateDTO dto) {
         return service.create(dto);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public StatusDTO update(@Valid @RequestBody StatusUpdateDTO dto, @PathVariable long id) {
         return service.update(dto, id);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable long id) {
         service.destroy(id);
