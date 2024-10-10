@@ -26,4 +26,9 @@ public class UserUtils {
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " not found"));
         return maybeUser.getEmail().equals(email);
     }
+
+    public boolean isExists(String email) {
+        var maybeUser = userRepository.findByEmail(email);
+        return maybeUser.isPresent();
+    }
 }

@@ -83,7 +83,7 @@ class StatusControllerTest {
 	void indexTest() throws Exception {
 		statusList.forEach(statusRepository::save);
 
-		var request = get("/api/task_statuses").with(jwt());
+		var request = get("/api/task_statuses").with(token);
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
@@ -108,7 +108,7 @@ class StatusControllerTest {
 		var body = response.getResponse().getContentAsString();
 		var teststatus = statusRepository.findById(id);
 
-		assertThat(teststatus).isNotNull();
+		assertThat(teststatus).isNotEmpty();
 		assertThatJson(body).and(
 				n -> n.node("name").isEqualTo(status.getName()),
 				n -> n.node("slug").isEqualTo(status.getSlug())
@@ -121,10 +121,10 @@ class StatusControllerTest {
 
 		var request = get("/api/task_statuses/{id}", id).with(tokenFailed);
 		mockMvc.perform(request)
-				.andExpect(status().isUnauthorized());
+				.andExpect(status().isForbidden());
 		var teststatus = statusRepository.findById(id);
 
-		assertThat(teststatus).isNotNull();
+		assertThat(teststatus).isNotEmpty();
 	}
 
 	@Test
@@ -187,7 +187,7 @@ class StatusControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		mockMvc.perform(request)
-				.andExpect(status().isUnauthorized());
+				.andExpect(status().isForbidden());
 		assertThat(statusRepository.findById(id).get().getName()).isEqualTo(status.getName());
 	}
 
@@ -209,7 +209,7 @@ class StatusControllerTest {
 
 		var request = delete("/api/task_statuses/{id}", id).with(tokenFailed);
 		mockMvc.perform(request)
-				.andExpect(status().isUnauthorized());
+				.andExpect(status().isForbidden());
 
 		var maybestatus = statusRepository.findById(id).orElse(null);
 		assertThat(maybestatus).isNotNull();
