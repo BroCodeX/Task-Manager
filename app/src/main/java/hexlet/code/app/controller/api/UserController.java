@@ -6,6 +6,7 @@ import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.service.UserService;
+import hexlet.code.app.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +31,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserUtils userUtils;
+
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
@@ -43,7 +47,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and @userService.isOwner(#id, authentication.principal.getClaim('sub'))")
+    @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @PostAuthorize("returnObject.email == authentication.principal.getClaim('sub')")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable long id) {
@@ -58,14 +62,14 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and @userService.isOwner(#id, authentication.principal.getClaim('sub'))")
+    @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@Valid @RequestBody UserUpdateDTO dto, @PathVariable long id) {
         return userService.update(dto, id);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and @userService.isOwner(#id, authentication.principal.getClaim('sub'))")
+    @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable long id) {
         userService.destroy(id);

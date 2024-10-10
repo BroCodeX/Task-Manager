@@ -1,4 +1,4 @@
-package hexlet.code.app.util;
+package hexlet.code.app.component;
 
 import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.mapper.UserMapper;
