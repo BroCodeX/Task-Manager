@@ -145,8 +145,8 @@ class StatusControllerTest {
 
 		assertThat(teststatus).isNotNull();
 		assertThatJson(body).and(
-				n -> n.node("name").isEqualTo("yandex-status-test"),
-				n -> n.node("slug").isEqualTo("yandex-slug-test")
+				n -> n.node("name").isEqualTo(refData.get("name")),
+				n -> n.node("slug").isEqualTo(refData.get("slug"))
 		);
 	}
 
@@ -168,8 +168,8 @@ class StatusControllerTest {
 		var body = response.getResponse().getContentAsString();
 
 		assertThatJson(body).and(
-				n -> n.node("name").isEqualTo("yandex-name-test"),
-				n -> n.node("slug").isEqualTo("yandex-slug-test")
+				n -> n.node("name").isEqualTo(refData.get("name")),
+				n -> n.node("slug").isEqualTo(refData.get("slug"))
 		);
 		assertThat(statusRepository.findById(id).get().getName()).isEqualTo(refData.get("name"));
 	}

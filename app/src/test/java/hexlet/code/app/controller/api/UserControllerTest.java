@@ -145,7 +145,7 @@ class UserControllerTest {
 				.andExpect(status().isForbidden());
 		var testUser = userRepository.findById(id);
 
-		assertThat(testUser).isNotNull();
+		assertThat(testUser).isNotEmpty();
 	}
 
 	@Test
@@ -168,9 +168,9 @@ class UserControllerTest {
 
 		assertThat(testUser).isNotNull();
 		assertThatJson(body).and(
-				n -> n.node("email").isEqualTo("yandextestcreate@test.com"),
-				n -> n.node("firstName").isEqualTo("yandexfirstName@test.com"),
-				n -> n.node("lastName").isEqualTo("yandexlastName@test.com")
+				n -> n.node("email").isEqualTo(refData.get("email")),
+				n -> n.node("firstName").isEqualTo(refData.get("firstName")),
+				n -> n.node("lastName").isEqualTo(refData.get("lastName"))
 		);
 	}
 
@@ -193,9 +193,9 @@ class UserControllerTest {
 		var body = response.getResponse().getContentAsString();
 
 		assertThatJson(body).and(
-				n -> n.node("email").isEqualTo("yandextestupdate@test.com"),
-				n -> n.node("firstName").isEqualTo("nowaFirstName@test.com"),
-				n -> n.node("lastName").isEqualTo("nowaLastName@test.com")
+				n -> n.node("email").isEqualTo(refData.get("email")),
+				n -> n.node("firstName").isEqualTo(refData.get("firstName")),
+				n -> n.node("lastName").isEqualTo(refData.get("lastName"))
 		);
 		assertThat(userRepository.findById(id).get().getEmail()).isEqualTo(refData.get("email"));
 	}
