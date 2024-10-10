@@ -4,14 +4,9 @@ import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.mapper.UserMapper;
-import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import hexlet.code.app.dto.UserDTO;
@@ -39,7 +34,7 @@ public class UserService {
 
     public UserDTO show(Long id) {
         var maybeUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " is not found"));
+                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         return mapper.map(maybeUser);
     }
 
@@ -55,7 +50,7 @@ public class UserService {
 
     public UserDTO update(UserUpdateDTO dto, long id) {
         var maybeUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " is not found"));
+                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         if (dto.getPassword() != null && dto.getPassword().isPresent()) {
             var hashedPass = passwordEncoder.encode(dto.getPassword().get());
             dto.setPassword(JsonNullable.of(hashedPass));
@@ -67,11 +62,5 @@ public class UserService {
 
     public void destroy(long id) {
         userRepository.deleteById(id);
-    }
-
-    public boolean isOwner(Long id, String email) {
-        var maybeUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " not found"));
-        return maybeUser.getEmail().equals(email);
     }
 }

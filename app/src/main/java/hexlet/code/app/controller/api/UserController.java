@@ -6,9 +6,9 @@ import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.service.UserService;
+import hexlet.code.app.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
@@ -31,7 +31,10 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/users")
+    @Autowired
+    private UserUtils userUtils;
+
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserDTO>> index(@RequestParam(defaultValue = "10") Integer limit) {
@@ -43,30 +46,30 @@ public class UserController {
                 .body(users);
     }
 
-    @GetMapping("/users/{id}")
-    @PreAuthorize("isAuthenticated() and @userService.isOwner(#id, authentication.principal.getClaim('sub'))")
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @PostAuthorize("returnObject.email == authentication.principal.getClaim('sub')")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable long id) {
         return userService.show(id);
     }
 
-    @PostMapping("/users")
+    @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO dto) {
         return userService.create(dto);
     }
 
-    @PutMapping("/users/{id}")
-    @PreAuthorize("isAuthenticated() and @userService.isOwner(#id, authentication.principal.getClaim('sub'))")
+    @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@Valid @RequestBody UserUpdateDTO dto, @PathVariable long id) {
         return userService.update(dto, id);
     }
 
-    @DeleteMapping("/users/{id}")
-    @PreAuthorize("isAuthenticated() and @userService.isOwner(#id, authentication.principal.getClaim('sub'))")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable long id) {
         userService.destroy(id);

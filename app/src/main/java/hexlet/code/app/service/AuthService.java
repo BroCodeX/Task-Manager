@@ -8,7 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserAuthService {
+public class AuthService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
