@@ -39,7 +39,7 @@ public class UserService {
 
     public UserDTO show(Long id) {
         var maybeUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " is not found"));
+                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         return mapper.map(maybeUser);
     }
 
@@ -55,7 +55,7 @@ public class UserService {
 
     public UserDTO update(UserUpdateDTO dto, long id) {
         var maybeUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " is not found"));
+                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         if (dto.getPassword() != null && dto.getPassword().isPresent()) {
             var hashedPass = passwordEncoder.encode(dto.getPassword().get());
             dto.setPassword(JsonNullable.of(hashedPass));
@@ -71,7 +71,7 @@ public class UserService {
 
     public boolean isOwner(Long id, String email) {
         var maybeUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " not found"));
         return maybeUser.getEmail().equals(email);
     }
 }

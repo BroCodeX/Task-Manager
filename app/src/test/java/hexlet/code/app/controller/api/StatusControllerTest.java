@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.StatusDTO;
 import hexlet.code.app.mapper.StatusMapper;
 import hexlet.code.app.model.Status;
+import hexlet.code.app.model.User;
 import hexlet.code.app.repository.StatusRepository;
+import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +57,8 @@ class StatusControllerTest {
 
 	private JwtRequestPostProcessor token;
 
+	private JwtRequestPostProcessor tokenFailed;
+
 	private Status status;
 
 	private List<Status> statusList;
@@ -68,6 +72,8 @@ class StatusControllerTest {
 				.build();
 
 		token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
+
+		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
 		status = Instancio.of(generator.getStatusModel()).create();
 		statusList = generator.getStatusModelList().stream().map(Instancio::create).toList();
@@ -115,7 +121,7 @@ class StatusControllerTest {
 	void showTestFailed() throws Exception {
 		long id  = status.getId();
 
-		var request = get("/api/task_statuses/{id}", id).with(token);
+		var request = get("/api/task_statuses/{id}", id).with(tokenFailed);
 		mockMvc.perform(request)
 				.andExpect(status().isForbidden());
 		var teststatus = statusRepository.findById(id);
@@ -151,7 +157,7 @@ class StatusControllerTest {
 		long id  = status.getId();
 
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-status-test");
+		refData.put("name", "yandex-name-test");
 		refData.put("slug", "yandex-slug-test");
 
 		var request = put("/api/task_statuses/{id}", id)
@@ -164,7 +170,7 @@ class StatusControllerTest {
 		var body = response.getResponse().getContentAsString();
 
 		assertThatJson(body).and(
-				n -> n.node("name").isEqualTo("yandex-status-test"),
+				n -> n.node("name").isEqualTo("yandex-name-test"),
 				n -> n.node("slug").isEqualTo("yandex-slug-test")
 		);
 		assertThat(statusRepository.findById(id).get().getName()).isEqualTo(refData.get("name"));
@@ -179,7 +185,7 @@ class StatusControllerTest {
 		refData.put("slug", "yandex-slug-test");
 
 		var request = put("/api/task_statuses/{id}", id)
-				.with(token)
+				.with(tokenFailed)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		mockMvc.perform(request)
@@ -203,7 +209,7 @@ class StatusControllerTest {
 	void destroyTestFailed() throws Exception {
 		long id  = status.getId();
 
-		var request = delete("/api/task_statuses/{id}", id).with(token);
+		var request = delete("/api/task_statuses/{id}", id).with(tokenFailed);
 		mockMvc.perform(request)
 				.andExpect(status().isForbidden());
 
