@@ -6,7 +6,7 @@ import hexlet.code.app.dto.UserDTO;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
-import hexlet.code.app.util.UserGenerator;
+import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class UserControllerTest {
 	private MockMvc mockMvc;
 
 	@Autowired
-	private UserGenerator generator;
+	private ModelsGenerator generator;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -56,7 +56,7 @@ class UserControllerTest {
 
 	private JwtRequestPostProcessor token;
 
-	private JwtRequestPostProcessor tokenTestUser;
+	private JwtRequestPostProcessor tokenUser;
 
 	private User user;
 
@@ -73,9 +73,9 @@ class UserControllerTest {
 		token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
 
 		user = Instancio.of(generator.getUserModel()).create();
-		tokenTestUser = jwt().jwt(builder -> builder.subject(user.getEmail()));
+		tokenUser = jwt().jwt(builder -> builder.subject(user.getEmail()));
 
-		users = generator.getUsersModel().stream().map(Instancio::create).toList();
+		users = generator.getUserModelList().stream().map(Instancio::create).toList();
 
 		userRepository.save(user);
 	}
@@ -102,7 +102,7 @@ class UserControllerTest {
 	void showTest() throws Exception {
 		long id  = user.getId();
 
-		var request = get("/api/users/{id}", id).with(tokenTestUser);
+		var request = get("/api/users/{id}", id).with(tokenUser);
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
@@ -115,6 +115,18 @@ class UserControllerTest {
 				n -> n.node("firstName").isEqualTo(user.getFirstName()),
 				n -> n.node("lastName").isEqualTo(user.getLastName())
 		);
+	}
+
+	@Test
+	void showTestFailed() throws Exception {
+		long id  = user.getId();
+
+		var request = get("/api/users/{id}", id).with(token);
+		mockMvc.perform(request)
+				.andExpect(status().isForbidden());
+		var testUser = userRepository.findById(id);
+
+		assertThat(testUser).isNotNull();
 	}
 
 	@Test
@@ -153,7 +165,7 @@ class UserControllerTest {
 		refData.put("lastName", "nowaLastName@test.com");
 
 		var request = put("/api/users/{id}", id)
-				.with(tokenTestUser)
+				.with(tokenUser)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		var response = mockMvc.perform(request)
@@ -170,15 +182,45 @@ class UserControllerTest {
 	}
 
 	@Test
+	void updateTestFailed() throws Exception {
+		long id  = user.getId();
+
+		Map<String, String> refData = new HashMap<>();
+		refData.put("email", "yandextestupdate@test.com");
+		refData.put("firstName", "nowaFirstName@test.com");
+		refData.put("lastName", "nowaLastName@test.com");
+
+		var request = put("/api/users/{id}", id)
+				.with(token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(refData));
+		mockMvc.perform(request)
+				.andExpect(status().isForbidden());
+		assertThat(userRepository.findById(id).get().getEmail()).isEqualTo(user.getEmail());
+	}
+
+	@Test
 	void destroyTest() throws Exception {
 		long id  = user.getId();
 
-		var request = delete("/api/users/{id}", id).with(tokenTestUser);
+		var request = delete("/api/users/{id}", id).with(tokenUser);
 		mockMvc.perform(request)
 				.andExpect(status().isNoContent());
 
 		var maybeUser = userRepository.findById(id).orElse(null);
 		assertThat(maybeUser).isNull();
+	}
+
+	@Test
+	void destroyTestFailed() throws Exception {
+		long id  = user.getId();
+
+		var request = delete("/api/users/{id}", id).with(token);
+		mockMvc.perform(request)
+				.andExpect(status().isForbidden());
+
+		var maybeUser = userRepository.findById(id).orElse(null);
+		assertThat(maybeUser).isNotNull();
 	}
 
 }

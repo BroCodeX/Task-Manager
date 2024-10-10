@@ -3,6 +3,7 @@ package hexlet.code.app.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,12 +27,12 @@ public class Status {
 
     @NotBlank
     @Column(unique = true)
-    @Min(value = 1)
+    @Size(min = 1)
     private String name;
 
     @NotBlank
     @Column(unique = true)
-    @Min(value = 1)
+    @Size(min = 1)
     private String slug;
 
     @CreatedDate
