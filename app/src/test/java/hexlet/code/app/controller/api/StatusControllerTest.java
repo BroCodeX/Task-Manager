@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.StatusDTO;
 import hexlet.code.app.mapper.StatusMapper;
 import hexlet.code.app.model.Status;
-import hexlet.code.app.model.User;
 import hexlet.code.app.repository.StatusRepository;
-import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
@@ -123,7 +121,7 @@ class StatusControllerTest {
 
 		var request = get("/api/task_statuses/{id}", id).with(tokenFailed);
 		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
+				.andExpect(status().isUnauthorized());
 		var teststatus = statusRepository.findById(id);
 
 		assertThat(teststatus).isNotNull();
@@ -189,7 +187,7 @@ class StatusControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
+				.andExpect(status().isUnauthorized());
 		assertThat(statusRepository.findById(id).get().getName()).isEqualTo(status.getName());
 	}
 
@@ -211,7 +209,7 @@ class StatusControllerTest {
 
 		var request = delete("/api/task_statuses/{id}", id).with(tokenFailed);
 		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
+				.andExpect(status().isUnauthorized());
 
 		var maybestatus = statusRepository.findById(id).orElse(null);
 		assertThat(maybestatus).isNotNull();

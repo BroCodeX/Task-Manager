@@ -21,6 +21,7 @@ public class StatusService {
 
     public List<StatusDTO> getAll(int limit) {
         return repository.findAll().stream()
+                .limit(limit)
                 .map(mapper::map)
                 .toList();
     }
