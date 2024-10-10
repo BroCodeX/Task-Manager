@@ -80,6 +80,24 @@ class UserControllerTest {
 		userRepository.save(user);
 	}
 
+
+	@Test
+	void loginTest() throws Exception {
+		Map<String, String> logData = new HashMap<>();
+		logData.put("email", "noexist@test.com");
+		logData.put("password", "noexist");
+		token = jwt().jwt(builder -> builder.subject(logData.get("email")));
+		var request = post("/api/login")
+				.with(token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(logData));
+
+		var response = mockMvc.perform(request)
+				.andExpect(status().isUnauthorized());
+
+		assertThat(userRepository.findByEmail(logData.get("email"))).isEmpty();
+	}
+
 	@Test
 	void indexTest() throws Exception {
 		users.forEach(userRepository::save);
@@ -98,6 +116,7 @@ class UserControllerTest {
 		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
 	}
 
+
 	@Test
 	void showTest() throws Exception {
 		long id  = user.getId();
@@ -109,7 +128,7 @@ class UserControllerTest {
 		var body = response.getResponse().getContentAsString();
 		var testUser = userRepository.findById(id);
 
-		assertThat(testUser).isNotNull();
+		assertThat(testUser).isNotEmpty();
 		assertThatJson(body).and(
 				n -> n.node("email").isEqualTo(user.getEmail()),
 				n -> n.node("firstName").isEqualTo(user.getFirstName()),
