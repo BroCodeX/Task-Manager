@@ -2,6 +2,7 @@ package hexlet.code.app.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -36,4 +37,8 @@ public class Status {
 
     @CreatedDate
     private LocalDate createdAt;
+
+    @NotNull
+    @OneToOne(mappedBy = "taskStatus")
+    private Task task;
 }

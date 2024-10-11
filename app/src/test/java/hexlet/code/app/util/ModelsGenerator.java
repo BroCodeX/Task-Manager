@@ -1,6 +1,7 @@
 package hexlet.code.app.util;
 
 import hexlet.code.app.model.Status;
+import hexlet.code.app.model.Task;
 import hexlet.code.app.model.User;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class ModelsGenerator {
     private List<Model<User>> userModelList;
     private Model<Status> statusModel;
     private List<Model<Status>> statusModelList;
+    private Model<Task> taskModel;
 
     @PostConstruct
     public void initData() {
@@ -42,6 +44,8 @@ public class ModelsGenerator {
         statusModelList = slugs.stream()
                 .map(this::makeFakeStatus)
                 .toList();
+
+        taskModel = makeFakeTask();
     }
 
     public Model<User> makeFakeUser() {
@@ -66,6 +70,15 @@ public class ModelsGenerator {
                 .ignore(Select.field(Status::getId))
                 .supply(Select.field(Status::getName), () -> faker.name().name())
                 .supply(Select.field(Status::getSlug), () -> slug)
+                .toModel();
+    }
+
+    public Model<Task> makeFakeTask() {
+        return Instancio.of(Task.class)
+                .ignore(Select.field(Task::getId))
+                .supply(Select.field(Task::getName), () -> faker.funnyName().name())
+                .supply(Select.field(Task::getDescription), () -> faker.esports().game())
+                .supply(Select.field(Task::getIndex), () -> Integer.valueOf(faker.number().digit()))
                 .toModel();
     }
 }

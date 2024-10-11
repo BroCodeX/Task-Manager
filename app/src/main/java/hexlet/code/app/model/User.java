@@ -58,6 +58,9 @@ public class User implements UserDetails {
     @LastModifiedDate
     private LocalDate updatedAt;
 
+    @OneToMany(mappedBy = "assignee", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Task task;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new ArrayList<>();

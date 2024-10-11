@@ -34,9 +34,12 @@ public class Task {
     @NotNull
     private String description;
 
-    @NotBlank
+    @NotNull
+    @OneToOne
+    @JoinColumn(name = "status_id")
     private Status taskStatus;
 
+    @ManyToOne
     private User assignee;
 
     @CreatedDate
