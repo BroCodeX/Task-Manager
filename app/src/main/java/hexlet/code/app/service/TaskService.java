@@ -22,6 +22,7 @@ public class TaskService {
     public List<TaskDTO> getAll(int limit) {
         return repository.findAll().stream()
                 .map(mapper::map)
+                .limit(limit)
                 .toList();
     }
 
