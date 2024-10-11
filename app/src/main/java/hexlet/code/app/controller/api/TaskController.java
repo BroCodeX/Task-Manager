@@ -6,6 +6,7 @@ import hexlet.code.app.dto.TaskUpdateDTO;
 import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.service.TaskService;
 import hexlet.code.app.util.UserUtils;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -42,21 +43,21 @@ public class TaskController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public TaskDTO show(@PathVariable long id) {
+    public TaskDTO show(@Valid @PathVariable long id) {
         return service.show(id);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public TaskDTO create(@RequestBody TaskCreateDTO dto) {
+    public TaskDTO create(@Valid @RequestBody TaskCreateDTO dto) {
         return service.create(dto);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public TaskDTO update(@RequestBody TaskUpdateDTO dto, @PathVariable long id) {
+    public TaskDTO update(@Valid @RequestBody TaskUpdateDTO dto, @PathVariable long id) {
         return service.update(dto, id);
     }
 

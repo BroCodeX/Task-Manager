@@ -18,7 +18,7 @@ public abstract class TaskMapper {
     @Mapping(source = "assignee_id", target = "assignee")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "status", target = "taskStatus")
+    @Mapping(source = "status", target = "taskStatus.name")
     public abstract Task map(TaskDTO dto);
 
     @Mapping(target = "assignee_id", source = "assignee.id")
@@ -30,11 +30,11 @@ public abstract class TaskMapper {
     @Mapping(source = "assignee_id", target = "assignee")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "status", target = "taskStatus")
+    @Mapping(source = "status", target = "taskStatus.name")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "status", target = "taskStatus")
+    @Mapping(source = "status", target = "taskStatus.name")
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task task);
 }
