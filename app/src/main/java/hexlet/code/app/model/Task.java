@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @Setter
 @EntityListeners(AuditingEntityListener.class)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Task {
+public class Task implements BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
@@ -40,6 +40,7 @@ public class Task {
     private Status taskStatus;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User assignee;
 
     @CreatedDate

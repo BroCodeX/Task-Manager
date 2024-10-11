@@ -31,6 +31,7 @@ public class ModelsGenerator {
     private Model<Status> statusModel;
     private List<Model<Status>> statusModelList;
     private Model<Task> taskModel;
+    private List<Model<Task>> taskList;
 
     @PostConstruct
     public void initData() {
@@ -46,6 +47,9 @@ public class ModelsGenerator {
                 .toList();
 
         taskModel = makeFakeTask();
+        taskList = IntStream.range(0, 6)
+                .mapToObj(i -> makeFakeTask())
+                .toList();
     }
 
     public Model<User> makeFakeUser() {

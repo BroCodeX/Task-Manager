@@ -2,10 +2,10 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.app.dto.StatusDTO;
-import hexlet.code.app.mapper.StatusMapper;
-import hexlet.code.app.model.Status;
-import hexlet.code.app.repository.StatusRepository;
+import hexlet.code.app.dto.TaskDTO;
+import hexlet.code.app.mapper.TaskMapper;
+import hexlet.code.app.model.Task;
+import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,13 +42,13 @@ class TaskControllerTest {
 	private ModelsGenerator generator;
 
 	@Autowired
-	private StatusRepository statusRepository;
+	private TaskRepository repository;
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@Autowired
-	private StatusMapper statusMapper;
+	private TaskMapper mapper;
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -57,13 +57,13 @@ class TaskControllerTest {
 
 	private JwtRequestPostProcessor tokenFailed;
 
-	private Status status;
+	private Task task;
 
-	private List<Status> statusList;
+	private List<Task> taskList;
 
 	@BeforeEach
 	void prepare() {
-		statusRepository.deleteAll();
+		repository.deleteAll();
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac)
 				.defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
 				.apply(springSecurity())
@@ -73,25 +73,28 @@ class TaskControllerTest {
 
 		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
-		status = Instancio.of(generator.getStatusModel()).create();
-		statusList = generator.getStatusModelList().stream().map(Instancio::create).toList();
+		task = Instancio.of(generator.makeFakeTask()).create();
 
-		statusRepository.save(status);
+		taskList = generator.getTaskList().stream()
+						.map(Instancio::create)
+						.toList();
+
+		repository.save(task);
 	}
 
 	@Test
 	void indexTest() throws Exception {
-		statusList.forEach(statusRepository::save);
+		taskList.forEach(repository::save);
 
-		var request = get("/api/task_statuses").with(token);
+		var request = get("/api/tasks/").with(token);
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<StatusDTO> statusDTOS = objectMapper.readValue(body, new TypeReference<>() {});
-		List<Status> actual = statusDTOS.stream().map(statusMapper::map).toList();
-		List<Status> expected = statusRepository.findAll();
+		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() {});
+		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
+		List<Task> expected = repository.findAll();
 
 		assertThatJson(body).isArray();
 		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
@@ -99,41 +102,41 @@ class TaskControllerTest {
 
 	@Test
 	void showTest() throws Exception {
-		long id  = status.getId();
+		long id  = task.getId();
 
-		var request = get("/api/task_statuses/{id}", id).with(token);
+		var request = get("/api/tasks/{id}", id).with(token);
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
-		var teststatus = statusRepository.findById(id);
+		var testTask = repository.findById(id);
 
-		assertThat(teststatus).isNotEmpty();
+		assertThat(testTask).isNotEmpty();
 		assertThatJson(body).and(
-				n -> n.node("name").isEqualTo(status.getName()),
-				n -> n.node("slug").isEqualTo(status.getSlug())
+				n -> n.node("name").isEqualTo(task.getName()),
+				n -> n.node("description").isEqualTo(task.getDescription())
 		);
 	}
 
 	@Test
 	void showTestFailed() throws Exception {
-		long id  = status.getId();
+		long id  = task.getId();
 
-		var request = get("/api/task_statuses/{id}", id).with(tokenFailed);
+		var request = get("/api/tasks/{id}", id).with(tokenFailed);
 		mockMvc.perform(request)
 				.andExpect(status().isForbidden());
-		var teststatus = statusRepository.findById(id);
+		var testTask = repository.findById(id);
 
-		assertThat(teststatus).isNotEmpty();
+		assertThat(testTask).isNotEmpty();
 	}
 
 	@Test
 	void createTest() throws Exception {
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-status-test");
-		refData.put("slug", "yandex-slug-test");
+		refData.put("name", "yandex-name-test");
+		refData.put("description", "yandex-description-test");
 
-		var request = post("/api/task_statuses")
+		var request = post("/api/tasks/")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
@@ -141,24 +144,24 @@ class TaskControllerTest {
 				.andExpect(status().isCreated())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
-		var teststatus = statusRepository.findBySlug(refData.get("slug")).orElse(null);
+		var testTask = repository.findByName(refData.get("name")).orElse(null);
 
-		assertThat(teststatus).isNotNull();
+		assertThat(testTask).isNotNull();
 		assertThatJson(body).and(
 				n -> n.node("name").isEqualTo(refData.get("name")),
-				n -> n.node("slug").isEqualTo(refData.get("slug"))
+				n -> n.node("description").isEqualTo(refData.get("description"))
 		);
 	}
 
 	@Test
 	void updateTest() throws Exception {
-		long id  = status.getId();
+		long id  = task.getId();
 
 		Map<String, String> refData = new HashMap<>();
 		refData.put("name", "yandex-name-test");
-		refData.put("slug", "yandex-slug-test");
+		refData.put("description", "yandex-description-test");
 
-		var request = put("/api/task_statuses/{id}", id)
+		var request = put("/api/tasks/{id}", id)
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
@@ -169,49 +172,49 @@ class TaskControllerTest {
 
 		assertThatJson(body).and(
 				n -> n.node("name").isEqualTo(refData.get("name")),
-				n -> n.node("slug").isEqualTo(refData.get("slug"))
+				n -> n.node("description").isEqualTo(refData.get("description"))
 		);
-		assertThat(statusRepository.findById(id).get().getName()).isEqualTo(refData.get("name"));
+		assertThat(repository.findById(id).get().getName()).isEqualTo(refData.get("name"));
 	}
 
 	@Test
 	void updateTestFailed() throws Exception {
-		long id  = status.getId();
+		long id  = task.getId();
 
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-status-test");
-		refData.put("slug", "yandex-slug-test");
+		refData.put("name", "yandex-name-test");
+		refData.put("description", "yandex-description-test");
 
-		var request = put("/api/task_statuses/{id}", id)
+		var request = put("/api/tasks/{id}", id)
 				.with(tokenFailed)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		mockMvc.perform(request)
 				.andExpect(status().isForbidden());
-		assertThat(statusRepository.findById(id).get().getName()).isEqualTo(status.getName());
+		assertThat(repository.findById(id).get().getName()).isEqualTo(task.getName());
 	}
 
 	@Test
 	void destroyTest() throws Exception {
-		long id  = status.getId();
+		long id  = task.getId();
 
-		var request = delete("/api/task_statuses/{id}", id).with(token);
+		var request = delete("/api/tasks/{id}", id).with(token);
 		mockMvc.perform(request)
 				.andExpect(status().isNoContent());
 
-		var maybestatus = statusRepository.findById(id).orElse(null);
-		assertThat(maybestatus).isNull();
+		var maybeTask = repository.findById(id).orElse(null);
+		assertThat(maybeTask).isNull();
 	}
 
 	@Test
 	void destroyTestFailed() throws Exception {
-		long id  = status.getId();
+		long id  = task.getId();
 
-		var request = delete("/api/task_statuses/{id}", id).with(tokenFailed);
+		var request = delete("/api/tasks/{id}", id).with(tokenFailed);
 		mockMvc.perform(request)
 				.andExpect(status().isForbidden());
 
-		var maybestatus = statusRepository.findById(id).orElse(null);
-		assertThat(maybestatus).isNotNull();
+		var maybeTask = repository.findById(id).orElse(null);
+		assertThat(maybeTask).isNotNull();
 	}
 }

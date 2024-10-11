@@ -7,18 +7,18 @@ import hexlet.code.app.model.Task;
 import org.mapstruct.*;
 
 @Mapper(
-        uses = {JsonNullableMapper.class},
+        uses = {JsonNullableMapper.class, ReferenceMapper.class},
         componentModel = MappingConstants.ComponentModel.SPRING,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedSourcePolicy = ReportingPolicy.WARN,
         unmappedTargetPolicy = ReportingPolicy.WARN
 )
-public abstract class TaksMapper {
+public abstract class TaskMapper {
 
-    @Mapping(source = "assignee_id", target = "assignee.id")
+    @Mapping(source = "assignee_id", target = "assignee")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "status", target = "taskStatus.name")
+    @Mapping(source = "status", target = "taskStatus")
     public abstract Task map(TaskDTO dto);
 
     @Mapping(target = "assignee_id", source = "assignee.id")
@@ -27,14 +27,14 @@ public abstract class TaksMapper {
     @Mapping(target = "status", source = "taskStatus.name")
     public abstract TaskDTO map(Task task);
 
-    @Mapping(source = "assignee_id", target = "assignee.id")
+    @Mapping(source = "assignee_id", target = "assignee")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "status", target = "taskStatus.name")
+    @Mapping(source = "status", target = "taskStatus")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "status", target = "taskStatus.name")
+    @Mapping(source = "status", target = "taskStatus")
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task task);
 }
