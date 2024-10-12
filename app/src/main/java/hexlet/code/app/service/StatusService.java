@@ -26,19 +26,19 @@ public class StatusService {
                 .toList();
     }
 
-    public StatusDTO show(long id) {
+    public StatusDTO showStatus(long id) {
         var maybeStatus =  repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         return mapper.map(maybeStatus);
     }
 
-    public StatusDTO create(StatusCreateDTO dto) {
+    public StatusDTO createStatus(StatusCreateDTO dto) {
         var status = mapper.map(dto);
         repository.save(status);
         return mapper.map(status);
     }
 
-    public StatusDTO update(StatusUpdateDTO dto, long id) {
+    public StatusDTO updateStatus(StatusUpdateDTO dto, long id) {
         var maybeStatus =  repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         mapper.update(dto, maybeStatus);
@@ -46,7 +46,7 @@ public class StatusService {
         return mapper.map(maybeStatus);
     }
 
-    public void destroy(long id) {
+    public void destroyStatus(long id) {
         repository.deleteById(id);
     }
 }

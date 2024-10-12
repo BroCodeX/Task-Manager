@@ -41,27 +41,27 @@ public class StatusController {
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public StatusDTO show(@PathVariable Long id) {
-        return service.show(id);
+        return service.showStatus(id);
     }
 
     @PostMapping("")
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.CREATED)
     public StatusDTO create(@Valid @RequestBody StatusCreateDTO dto) {
-        return service.create(dto);
+        return service.createStatus(dto);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public StatusDTO update(@Valid @RequestBody StatusUpdateDTO dto, @PathVariable Long id) {
-        return service.update(dto, id);
+        return service.updateStatus(dto, id);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable Long id) {
-        service.destroy(id);
+        service.destroyStatus(id);
     }
 }

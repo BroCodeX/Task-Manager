@@ -26,19 +26,19 @@ public class TaskService {
                 .toList();
     }
 
-    public TaskDTO show(long id) {
+    public TaskDTO showTask(long id) {
         var maybeTask =  repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         return mapper.map(maybeTask);
     }
 
-    public TaskDTO create(TaskCreateDTO dto) {
+    public TaskDTO createTask(TaskCreateDTO dto) {
         var task = mapper.map(dto);
         repository.save(task);
         return mapper.map(task);
     }
 
-    public TaskDTO update(TaskUpdateDTO dto, long id) {
+    public TaskDTO updateTask(TaskUpdateDTO dto, long id) {
         var maybeTask =  repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         mapper.update(dto, maybeTask);
@@ -46,7 +46,7 @@ public class TaskService {
         return mapper.map(maybeTask);
     }
 
-    public void destroy(long id) {
+    public void destroyTask(long id) {
         repository.deleteById(id);
     }
 }

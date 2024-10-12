@@ -32,14 +32,14 @@ public class UserService {
     }
 
 
-    public UserDTO show(Long id) {
+    public UserDTO showUser(Long id) {
         var maybeUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         return mapper.map(maybeUser);
     }
 
 
-    public UserDTO create(UserCreateDTO dto) {
+    public UserDTO createUser(UserCreateDTO dto) {
         var hashedPass = passwordEncoder.encode(dto.getPassword());
         var user = mapper.map(dto);
         user.setPassword(hashedPass);
@@ -48,7 +48,7 @@ public class UserService {
     }
 
 
-    public UserDTO update(UserUpdateDTO dto, long id) {
+    public UserDTO updateUser(UserUpdateDTO dto, long id) {
         var maybeUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         if (dto.getPassword() != null && dto.getPassword().isPresent()) {
@@ -60,7 +60,7 @@ public class UserService {
         return mapper.map(maybeUser);
     }
 
-    public void destroy(long id) {
+    public void destroyUser(long id) {
         userRepository.deleteById(id);
     }
 }

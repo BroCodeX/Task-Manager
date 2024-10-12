@@ -7,7 +7,6 @@ import hexlet.code.app.model.Status;
 import hexlet.code.app.repository.StatusRepository;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.service.StatusService;
-import hexlet.code.app.service.TaskService;
 import hexlet.code.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -15,7 +14,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -50,7 +48,7 @@ public class InitData implements ApplicationRunner {
         UserCreateDTO dto = new UserCreateDTO();
         dto.setEmail("hexlet@example.com");
         dto.setPassword("qwerty");
-        userService.create(dto);
+        userService.createUser(dto);
         var hexletUser = userRepository.findByEmail("hexlet@example.com").get();
         System.out.println("Init user: " + hexletUser + " created");
     }
@@ -66,7 +64,7 @@ public class InitData implements ApplicationRunner {
                             return dto;
                         }).toList();
 
-        statusListDTOS.forEach(statusService::create);
+        statusListDTOS.forEach(statusService::createStatus);
         List<String> checkTitles = statusRepository.findAll().stream()
                 .map(Status::getName)
                 .toList();

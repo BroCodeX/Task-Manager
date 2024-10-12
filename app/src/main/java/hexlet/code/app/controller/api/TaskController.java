@@ -44,27 +44,27 @@ public class TaskController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     public TaskDTO show(@Valid @PathVariable Long id) {
-        return service.show(id);
+        return service.showTask(id);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     public TaskDTO create(@Valid @RequestBody TaskCreateDTO dto) {
-        return service.create(dto);
+        return service.createTask(dto);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     public TaskDTO update(@Valid @RequestBody TaskUpdateDTO dto, @PathVariable Long id) {
-        return service.update(dto, id);
+        return service.updateTask(dto, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     public void destroy(@PathVariable Long id) {
-        service.destroy(id);
+        service.destroyTask(id);
     }
 }
