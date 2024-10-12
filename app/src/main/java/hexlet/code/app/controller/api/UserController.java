@@ -50,7 +50,7 @@ public class UserController {
     @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @PostAuthorize("returnObject.email == authentication.principal.getClaim('sub')")
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO show(@PathVariable long id) {
+    public UserDTO show(@PathVariable Long id) {
         return userService.show(id);
     }
 
@@ -64,7 +64,7 @@ public class UserController {
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO update(@Valid @RequestBody UserUpdateDTO dto, @PathVariable long id) {
+    public UserDTO update(@Valid @RequestBody UserUpdateDTO dto, @PathVariable Long id) {
         return userService.update(dto, id);
     }
 

@@ -26,10 +26,12 @@ public class Task implements BaseEntity {
 
     @NotBlank
     @Size(min = 1)
+    @Column(name = "title")
     private String name;
 
     private Integer index;
 
+    @Column(name = "content")
     private String description;
 
     @NotNull

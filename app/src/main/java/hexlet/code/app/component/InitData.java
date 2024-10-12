@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Component
 public class InitData implements ApplicationRunner {
@@ -56,17 +57,16 @@ public class InitData implements ApplicationRunner {
 
     public void initStatuses() {
         List<String> slugs = List.of("draft", "to_review", "to_be_fixed", "to_publish", "published");
-        List<String> titles = List.of("New", "In Progress", "On Testing", "Completed", "Blocked");
+        List<String> titles = List.of("Draft", "To Review", "To Be Fixed", "To Publish", "Published");
+        List<StatusCreateDTO> statusListDTOS = IntStream.range(0, titles.size())
+                        .mapToObj(i -> {
+                            var dto = new StatusCreateDTO();
+                            dto.setName(titles.get(i));
+                            dto.setSlug(slugs.get(i));
+                            return dto;
+                        }).toList();
 
-        List<StatusCreateDTO> statusList = titles.stream()
-                .map(s -> {
-                    var dto = new StatusCreateDTO();
-                    dto.setName(s);
-                    return dto;
-                })
-                .toList();
-
-        statusList.forEach(statusService::create);
+        statusListDTOS.forEach(statusService::create);
         List<String> checkTitles = statusRepository.findAll().stream()
                 .map(Status::getName)
                 .toList();
