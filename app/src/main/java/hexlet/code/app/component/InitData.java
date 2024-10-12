@@ -54,9 +54,9 @@ public class InitData implements ApplicationRunner {
             status.setSlug(slug);
             statusRepository.save(status);
         });
-        List<String> checkSlug = statusRepository.findAll().stream()
-                .map(item -> item.getSlug())
+        List<String> checkSlugs = statusRepository.findAll().stream()
+                .map(Status::getSlug)
                 .toList();
-        System.out.println("Init statuses: " + checkSlug + " created");
+        System.out.println("Init slugs: " + checkSlugs + " created");
     }
 }

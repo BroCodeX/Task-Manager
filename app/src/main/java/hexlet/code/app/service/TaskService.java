@@ -42,6 +42,7 @@ public class TaskService {
         var maybeTask =  repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         mapper.update(dto, maybeTask);
+        repository.save(maybeTask);
         return mapper.map(maybeTask);
     }
 

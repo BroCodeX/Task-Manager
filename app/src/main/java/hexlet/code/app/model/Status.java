@@ -39,6 +39,6 @@ public class Status implements BaseEntity {
     private LocalDate createdAt;
 
     @NotNull
-    @OneToOne(mappedBy = "taskStatus")
+    @OneToOne(mappedBy = "taskStatus", cascade = CascadeType.ALL)
     private Task task;
 }
