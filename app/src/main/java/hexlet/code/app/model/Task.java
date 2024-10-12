@@ -33,7 +33,7 @@ public class Task implements BaseEntity {
     private String description;
 
     @NotNull
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "status_id")
     private Status taskStatus;
 
