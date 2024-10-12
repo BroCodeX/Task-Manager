@@ -35,11 +35,9 @@ public class User implements UserDetails, BaseEntity {
     @ToString.Include
     private Long id;
 
-    @NotNull
     @Column(length = 50)
     private String firstName;
 
-    @NotNull
     @Column(length = 100)
     private String lastName;
 

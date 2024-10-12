@@ -12,6 +12,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -35,7 +36,7 @@ public class InitData implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         initUser();
-        initSlug();
+        initStatuses();
     }
 
     public void initUser() {
@@ -47,16 +48,23 @@ public class InitData implements ApplicationRunner {
         System.out.println("Init user: " + hexletUser + " created");
     }
 
-    public void initSlug() {
+    public void initStatuses() {
         List<String> slugs = List.of("draft", "to_review", "to_be_fixed", "to_publish", "published");
-        slugs.forEach(slug -> {
-            var status = new Status();
-            status.setSlug(slug);
-            statusRepository.save(status);
-        });
-        List<String> checkSlugs = statusRepository.findAll().stream()
-                .map(Status::getSlug)
+        List<String> titles = List.of("New", "In Progress", "On Testing", "Completed", "Blocked");
+
+        List<Status> statusList = titles.stream()
+                .map(s -> {
+                    var status = new Status();
+                    status.setName(s);
+                    status.setSlug("draft");
+                    return status;
+                })
                 .toList();
-        System.out.println("Init slugs: " + checkSlugs + " created");
+
+        statusRepository.saveAll(statusList);
+        List<String> checkTitles = statusRepository.findAll().stream()
+                .map(Status::getName)
+                .toList();
+        System.out.println("Init statuses: " + checkTitles + " created");
     }
 }

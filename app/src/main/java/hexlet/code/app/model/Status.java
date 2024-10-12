@@ -40,7 +40,6 @@ public class Status implements BaseEntity {
     @CreatedDate
     private LocalDate createdAt;
 
-    @NotNull
     @OneToMany(mappedBy = "taskStatus", cascade = CascadeType.ALL)
     private List<Task> tasks = new ArrayList<>();
 }
