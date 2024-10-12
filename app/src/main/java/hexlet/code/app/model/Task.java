@@ -28,10 +28,8 @@ public class Task implements BaseEntity {
     @Size(min = 1)
     private String name;
 
-    @NotNull
     private Integer index;
 
-    @NotNull
     private String description;
 
     @NotNull
