@@ -63,7 +63,7 @@ class StatusControllerTest {
 
 	@BeforeEach
 	void prepare() {
-		statusRepository.deleteAll();
+//		statusRepository.deleteAll();
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac)
 				.defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
 				.apply(springSecurity())
@@ -130,8 +130,8 @@ class StatusControllerTest {
 	@Test
 	void createTest() throws Exception {
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-status-test");
-		refData.put("slug", "yandex-slug-test");
+		refData.put("name", "yandex-status-create");
+		refData.put("slug", "yandex-slug-create");
 
 		var request = post("/api/task_statuses")
 				.with(token)
@@ -152,11 +152,12 @@ class StatusControllerTest {
 
 	@Test
 	void updateTest() throws Exception {
-		long id  = status.getId();
+
+		long id  = statusRepository.findById(status.getId()).get().getId();
 
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-name-test");
-		refData.put("slug", "yandex-slug-test");
+		refData.put("name", "yandex-name-update");
+		refData.put("slug", "yandex-slug-update");
 
 		var request = put("/api/task_statuses/{id}", id)
 				.with(token)
@@ -179,8 +180,8 @@ class StatusControllerTest {
 		long id  = status.getId();
 
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-status-test");
-		refData.put("slug", "yandex-slug-test");
+		refData.put("name", "yandex-status-failed");
+		refData.put("slug", "yandex-slug-failed");
 
 		var request = put("/api/task_statuses/{id}", id)
 				.with(tokenFailed)

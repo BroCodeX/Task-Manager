@@ -79,7 +79,7 @@ public class ModelsGenerator {
                 .ignore(Select.field(Task::getAssignee))
                 .supply(Select.field(Task::getName), () -> faker.funnyName().name())
                 .supply(Select.field(Task::getDescription), () -> faker.esports().game())
-                .supply(Select.field(Task::getTaskStatus), () -> statusRepository.findBySlug("draft").get())
+                .supply(Select.field(Task::getTaskStatus), () -> statusRepository.findByName("Draft").get())
                 .supply(Select.field(Task::getIndex), () -> Integer.valueOf(faker.number().digit()))
                 .toModel();
     }

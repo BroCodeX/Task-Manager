@@ -63,7 +63,7 @@ class TaskControllerTest {
 
 	@BeforeEach
 	void prepare() {
-		repository.deleteAll();
+
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac)
 				.defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
 				.apply(springSecurity())
@@ -132,8 +132,8 @@ class TaskControllerTest {
 	@Test
 	void createTest() throws Exception {
 		Map<String, String> refData = new HashMap<>();
-		refData.put("title", "yandex-name-test");
-		refData.put("content", "yandex-description-test");
+		refData.put("title", "yandex-name-create");
+		refData.put("content", "yandex-description-create");
 		refData.put("status", "Draft");
 
 		var request = post("/api/tasks")
@@ -159,8 +159,8 @@ class TaskControllerTest {
 		long id  = task.getId();
 
 		Map<String, String> refData = new HashMap<>();
-		refData.put("title", "yandex-name-test");
-		refData.put("content", "yandex-description-test");
+		refData.put("title", "yandex-name-update");
+		refData.put("content", "yandex-description-update");
 		refData.put("status", "To Review");
 
 		var request = put("/api/tasks/{id}", id)
@@ -185,8 +185,8 @@ class TaskControllerTest {
 		long id  = task.getId();
 
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-name-test");
-		refData.put("description", "yandex-description-test");
+		refData.put("name", "yandex-name-failed");
+		refData.put("description", "yandex-description-failed");
 
 		var request = put("/api/tasks/{id}", id)
 				.with(tokenFailed)
