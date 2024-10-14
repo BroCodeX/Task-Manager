@@ -40,7 +40,7 @@ public class Task implements BaseEntity {
     private Status taskStatus;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "assignee_id")
     private User assignee;
 
     @CreatedDate

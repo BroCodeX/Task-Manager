@@ -39,6 +39,6 @@ public class Status implements BaseEntity {
     @CreatedDate
     private LocalDate createdAt;
 
-    @OneToMany(mappedBy = "taskStatus")
+    @OneToMany(mappedBy = "taskStatus", orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
 }

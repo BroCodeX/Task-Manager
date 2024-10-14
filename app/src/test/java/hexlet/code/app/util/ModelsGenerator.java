@@ -3,6 +3,7 @@ package hexlet.code.app.util;
 import hexlet.code.app.model.Status;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.User;
+import hexlet.code.app.repository.StatusRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import net.datafaker.Faker;
@@ -25,6 +26,9 @@ public class ModelsGenerator {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private StatusRepository statusRepository;
 
     private Model<User> userModel;
     private List<Model<User>> userModelList;
@@ -72,9 +76,10 @@ public class ModelsGenerator {
     public Model<Task> makeFakeTask() {
         return Instancio.of(Task.class)
                 .ignore(Select.field(Task::getId))
+                .ignore(Select.field(Task::getAssignee))
                 .supply(Select.field(Task::getName), () -> faker.funnyName().name())
                 .supply(Select.field(Task::getDescription), () -> faker.esports().game())
-                .supply(Select.field(Task::getTaskStatus), () -> Instancio.of(makeFakeStatus()).create())
+                .supply(Select.field(Task::getTaskStatus), () -> statusRepository.findBySlug("draft").get())
                 .supply(Select.field(Task::getIndex), () -> Integer.valueOf(faker.number().digit()))
                 .toModel();
     }

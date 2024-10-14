@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.TaskDTO;
 import hexlet.code.app.mapper.TaskMapper;
-import hexlet.code.app.model.Status;
 import hexlet.code.app.model.Task;
-import hexlet.code.app.repository.StatusRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
@@ -63,11 +61,6 @@ class TaskControllerTest {
 
 	private List<Task> taskList;
 
-	private Status status;
-
-	@Autowired
-	private StatusRepository statusRepository;
-
 	@BeforeEach
 	void prepare() {
 		repository.deleteAll();
@@ -81,17 +74,10 @@ class TaskControllerTest {
 		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
 		task = Instancio.of(generator.makeFakeTask()).create();
-		status = Instancio.of(generator.makeFakeStatus()).create();
-		task.setTaskStatus(status);
-		statusRepository.save(status);
 		repository.save(task);
 
 		taskList = generator.getTaskList().stream()
-						.map(i -> {
-							var item = Instancio.of(i).create();
-							item.setTaskStatus(Instancio.of(generator.makeFakeStatus()).create());
-							return item;
-						})
+						.map(Instancio::create)
 						.toList();
 	}
 
@@ -99,7 +85,7 @@ class TaskControllerTest {
 	void indexTest() throws Exception {
 		taskList.forEach(repository::save);
 
-		var request = get("/api/tasks/").with(token);
+		var request = get("/api/tasks").with(token);
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
@@ -126,8 +112,8 @@ class TaskControllerTest {
 
 		assertThat(testTask).isNotEmpty();
 		assertThatJson(body).and(
-				n -> n.node("name").isEqualTo(task.getName()),
-				n -> n.node("description").isEqualTo(task.getDescription())
+				n -> n.node("title").isEqualTo(task.getName()),
+				n -> n.node("content").isEqualTo(task.getDescription())
 		);
 	}
 
@@ -146,10 +132,11 @@ class TaskControllerTest {
 	@Test
 	void createTest() throws Exception {
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-name-test");
-		refData.put("description", "yandex-description-test");
+		refData.put("title", "yandex-name-test");
+		refData.put("content", "yandex-description-test");
+		refData.put("status", "draft");
 
-		var request = post("/api/tasks/")
+		var request = post("/api/tasks")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
@@ -161,8 +148,9 @@ class TaskControllerTest {
 
 		assertThat(testTask).isNotNull();
 		assertThatJson(body).and(
-				n -> n.node("name").isEqualTo(refData.get("name")),
-				n -> n.node("description").isEqualTo(refData.get("description"))
+				n -> n.node("title").isEqualTo(refData.get("title")),
+				n -> n.node("content").isEqualTo(refData.get("content")),
+				n -> n.node("status").isEqualTo(refData.get("status"))
 		);
 	}
 
@@ -171,8 +159,9 @@ class TaskControllerTest {
 		long id  = task.getId();
 
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-name-test");
-		refData.put("description", "yandex-description-test");
+		refData.put("title", "yandex-name-test");
+		refData.put("content", "yandex-description-test");
+		refData.put("status", "To Review");
 
 		var request = put("/api/tasks/{id}", id)
 				.with(token)
@@ -184,10 +173,11 @@ class TaskControllerTest {
 		var body = response.getResponse().getContentAsString();
 
 		assertThatJson(body).and(
-				n -> n.node("name").isEqualTo(refData.get("name")),
-				n -> n.node("description").isEqualTo(refData.get("description"))
+				n -> n.node("title").isEqualTo(refData.get("title")),
+				n -> n.node("content").isEqualTo(refData.get("content")),
+				n -> n.node("status").isEqualTo(refData.get("To Review"))
 		);
-		assertThat(repository.findById(id).get().getName()).isEqualTo(refData.get("name"));
+		assertThat(repository.findById(id).get().getName()).isEqualTo(refData.get("title"));
 	}
 
 	@Test
