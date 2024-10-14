@@ -8,6 +8,7 @@ import hexlet.code.app.model.Status;
 import hexlet.code.app.repository.StatusRepository;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,11 @@ class StatusControllerTest {
 		statusRepository.save(status);
 	}
 
+	@AfterEach
+	void cleanRepo() {
+		statusRepository.deleteById(status.getId());
+	}
+
 	@Test
 	void indexTest() throws Exception {
 		//statusList.forEach(statusRepository::save);
@@ -112,6 +118,7 @@ class StatusControllerTest {
 				n -> n.node("name").isEqualTo(status.getName()),
 				n -> n.node("slug").isEqualTo(status.getSlug())
 		);
+
 	}
 
 	@Test
@@ -151,8 +158,7 @@ class StatusControllerTest {
 
 	@Test
 	void updateTest() throws Exception {
-
-		long id  = statusRepository.findById(status.getId()).get().getId();
+		long id  = status.getId();
 
 		Map<String, String> refData = new HashMap<>();
 		refData.put("name", "yandex-name-update");
