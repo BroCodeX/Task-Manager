@@ -59,7 +59,7 @@ class StatusControllerTest {
 
 	private Status status;
 
-	private List<Status> statusList;
+//	private List<Status> statusList;
 
 	@BeforeEach
 	void prepare() {
@@ -74,14 +74,14 @@ class StatusControllerTest {
 		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
 		status = Instancio.of(generator.getStatusModel()).create();
-		statusList = generator.getStatusModelList().stream().map(Instancio::create).toList();
+//		statusList = generator.getStatusModelList().stream().map(Instancio::create).toList();
 
 		statusRepository.save(status);
 	}
 
 	@Test
 	void indexTest() throws Exception {
-		statusList.forEach(statusRepository::save);
+		//statusList.forEach(statusRepository::save);
 
 		var request = get("/api/task_statuses").with(token);
 		var response = mockMvc.perform(request)

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.TaskDTO;
 import hexlet.code.app.mapper.TaskMapper;
+import hexlet.code.app.model.Status;
 import hexlet.code.app.model.Task;
+import hexlet.code.app.repository.StatusRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
@@ -61,6 +63,11 @@ class TaskControllerTest {
 
 	private List<Task> taskList;
 
+	private Status status;
+
+	@Autowired
+	private StatusRepository statusRepository;
+
 	@BeforeEach
 	void prepare() {
 		repository.deleteAll();
@@ -74,12 +81,18 @@ class TaskControllerTest {
 		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
 		task = Instancio.of(generator.makeFakeTask()).create();
+		status = Instancio.of(generator.makeFakeStatus()).create();
+		task.setTaskStatus(status);
+		statusRepository.save(status);
+		repository.save(task);
 
 		taskList = generator.getTaskList().stream()
-						.map(Instancio::create)
+						.map(i -> {
+							var item = Instancio.of(i).create();
+							item.setTaskStatus(Instancio.of(generator.makeFakeStatus()).create());
+							return item;
+						})
 						.toList();
-
-		repository.save(task);
 	}
 
 	@Test

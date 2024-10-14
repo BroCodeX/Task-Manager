@@ -57,8 +57,8 @@ public class User implements UserDetails, BaseEntity {
     @LastModifiedDate
     private LocalDate updatedAt;
 
-    @OneToMany(mappedBy = "assignee", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<Task> task = new ArrayList<>();
+    @OneToMany(mappedBy = "assignee", orphanRemoval = true)
+    private List<Task> tasks = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

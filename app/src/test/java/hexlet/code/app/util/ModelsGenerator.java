@@ -40,10 +40,9 @@ public class ModelsGenerator {
                 .mapToObj(i -> makeFakeUser())
                 .collect(Collectors.toList());
 
-        List<String> slugs = List.of("draft", "to_review", "to_be_fixed", "to_publish", "published");
         statusModel = makeFakeStatus();
-        statusModelList = slugs.stream()
-                .map(this::makeFakeStatus)
+        statusModelList = IntStream.range(0, 6)
+                .mapToObj(i -> makeFakeStatus())
                 .toList();
 
         taskModel = makeFakeTask();
@@ -66,14 +65,7 @@ public class ModelsGenerator {
         return Instancio.of(Status.class)
                 .ignore(Select.field(Status::getId))
                 .supply(Select.field(Status::getName), () -> faker.name().name())
-                .toModel();
-    }
-
-    public Model<Status> makeFakeStatus(String slug) {
-        return Instancio.of(Status.class)
-                .ignore(Select.field(Status::getId))
-                .supply(Select.field(Status::getName), () -> faker.name().name())
-                .supply(Select.field(Status::getSlug), () -> slug)
+                .supply(Select.field(Status::getSlug), () -> faker.hobbit().character())
                 .toModel();
     }
 
@@ -82,6 +74,7 @@ public class ModelsGenerator {
                 .ignore(Select.field(Task::getId))
                 .supply(Select.field(Task::getName), () -> faker.funnyName().name())
                 .supply(Select.field(Task::getDescription), () -> faker.esports().game())
+                .supply(Select.field(Task::getTaskStatus), () -> Instancio.of(makeFakeStatus()).create())
                 .supply(Select.field(Task::getIndex), () -> Integer.valueOf(faker.number().digit()))
                 .toModel();
     }
