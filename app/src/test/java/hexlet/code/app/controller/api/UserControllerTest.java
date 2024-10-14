@@ -64,7 +64,7 @@ class UserControllerTest {
 
 	@BeforeEach
 	void prepare() {
-		userRepository.deleteAll();
+
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac)
 				.defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
 				.apply(springSecurity())

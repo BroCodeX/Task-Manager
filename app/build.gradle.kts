@@ -47,6 +47,7 @@ dependencies {
 	implementation("org.apache.commons:commons-collections4:4.4")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
+	implementation("com.puppycrawl.tools:checkstyle:10.18.2")
 
 	// DB
 	implementation("org.postgresql:postgresql:42.7.3")

@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -26,7 +27,7 @@ import java.util.Collection;
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class User implements UserDetails {
+public class User implements UserDetails, BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,11 +35,9 @@ public class User implements UserDetails {
     @ToString.Include
     private Long id;
 
-    @NotNull
     @Column(length = 50)
     private String firstName;
 
-    @NotNull
     @Column(length = 100)
     private String lastName;
 
@@ -57,6 +56,9 @@ public class User implements UserDetails {
 
     @LastModifiedDate
     private LocalDate updatedAt;
+
+    @OneToMany(mappedBy = "assignee", orphanRemoval = true)
+    private List<Task> tasks = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

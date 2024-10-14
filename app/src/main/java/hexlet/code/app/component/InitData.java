@@ -1,10 +1,12 @@
 package hexlet.code.app.component;
 
+import hexlet.code.app.dto.StatusCreateDTO;
 import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.Status;
 import hexlet.code.app.repository.StatusRepository;
 import hexlet.code.app.repository.UserRepository;
+import hexlet.code.app.service.StatusService;
 import hexlet.code.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -13,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Component
 public class InitData implements ApplicationRunner {
@@ -32,31 +35,39 @@ public class InitData implements ApplicationRunner {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private StatusService statusService;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         initUser();
-        initSlug();
+        initStatuses();
     }
 
     public void initUser() {
         UserCreateDTO dto = new UserCreateDTO();
         dto.setEmail("hexlet@example.com");
         dto.setPassword("qwerty");
-        userService.create(dto);
+        userService.createUser(dto);
         var hexletUser = userRepository.findByEmail("hexlet@example.com").get();
         System.out.println("Init user: " + hexletUser + " created");
     }
 
-    public void initSlug() {
+    public void initStatuses() {
         List<String> slugs = List.of("draft", "to_review", "to_be_fixed", "to_publish", "published");
-        slugs.forEach(slug -> {
-            var status = new Status();
-            status.setSlug(slug);
-            statusRepository.save(status);
-        });
-        List<String> checkSlug = statusRepository.findAll().stream()
-                .map(item -> item.getSlug())
+        List<String> titles = List.of("Draft", "To Review", "To Be Fixed", "To Publish", "Published");
+        List<StatusCreateDTO> statusListDTOS = IntStream.range(0, titles.size())
+                        .mapToObj(i -> {
+                            var dto = new StatusCreateDTO();
+                            dto.setName(titles.get(i));
+                            dto.setSlug(slugs.get(i));
+                            return dto;
+                        }).toList();
+
+        statusListDTOS.forEach(statusService::createStatus);
+        List<String> checkTitles = statusRepository.findAll().stream()
+                .map(Status::getName)
                 .toList();
-        System.out.println("Init statuses: " + checkSlug + " created");
+        System.out.println("Init statuses: " + checkTitles + " created");
     }
 }
