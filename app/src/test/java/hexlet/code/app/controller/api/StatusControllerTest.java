@@ -63,7 +63,6 @@ class StatusControllerTest {
 
 	@BeforeEach
 	void prepare() {
-//		statusRepository.deleteAll();
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac)
 				.defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
 				.apply(springSecurity())
@@ -130,8 +129,8 @@ class StatusControllerTest {
 	@Test
 	void createTest() throws Exception {
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-status-create");
-		refData.put("slug", "yandex-slug-create");
+		refData.put("name", "yandex-status-create-test");
+		refData.put("slug", "yandex-slug-create-test");
 
 		var request = post("/api/task_statuses")
 				.with(token)
