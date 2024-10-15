@@ -1,5 +1,6 @@
 package hexlet.code.app.mapper;
 
+import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.model.BaseEntity;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Status;
@@ -12,6 +13,7 @@ import org.mapstruct.Named;
 import org.mapstruct.TargetType;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(
@@ -37,21 +39,22 @@ public class ReferenceMapper {
     }
 
     @Named("toLabelEntity")
-    public Label toLabelEntity(String label) {
-        return labelRepository.findByName(label).orElse(null);
+    public Label toLabelEntity(Long labelID) {
+        return labelRepository.findById(labelID)
+                .orElseThrow(() -> new ResourceNotFoundExcepiton("Label with id " + labelID + " not found"));
     }
 
     @Named("toLabelEntities")
-    public List<Label> toLabelEntities(List<String> labels) {
-        return labels.stream()
+    public List<Label> toLabelEntities(List<Long> labelsIDs) {
+        return labelsIDs == null ? new ArrayList<>() : labelsIDs.stream()
                 .map(this::toLabelEntity)
                 .toList();
     }
 
     @Named("toLabelNames")
-    public List<String> toLabelNames(List<Label> labels) {
-        return labels.stream()
-                .map(Label::getName)
+    public List<Long> toLabelNames(List<Label> labels) {
+        return labels == null ? new ArrayList<>() :labels.stream()
+                .map(Label::getId)
                 .toList();
     }
 }

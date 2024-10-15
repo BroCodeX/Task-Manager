@@ -141,7 +141,7 @@ class TaskControllerTest {
 		refData.put("title", "yandex-name-create");
 		refData.put("content", "yandex-description-create");
 		refData.put("status", "Draft");
-		refData.put("labels", List.of("bug"));
+		refData.put("labels", List.of(1L));
 
 		var request = post("/api/tasks")
 				.with(token)

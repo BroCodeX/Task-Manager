@@ -91,7 +91,7 @@ public class ModelsGenerator {
                 .supply(Select.field(TaskCreateDTO::getContent), () -> faker.esports().game())
                 .supply(Select.field(TaskCreateDTO::getStatus), () -> "Draft")
                 .supply(Select.field(TaskCreateDTO::getIndex), () -> Integer.valueOf(faker.number().digit()))
-                .supply(Select.field(TaskCreateDTO::getLabels), () -> List.of("bug"))
+                .supply(Select.field(TaskCreateDTO::getLabels), () -> List.of(1L))
                 .toModel();
     }
 
