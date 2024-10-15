@@ -6,6 +6,7 @@ import hexlet.code.app.dto.status.StatusDTO;
 import hexlet.code.app.mapper.StatusMapper;
 import hexlet.code.app.model.Status;
 import hexlet.code.app.repository.StatusRepository;
+import hexlet.code.app.service.StatusService;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
@@ -46,6 +47,9 @@ class StatusControllerTest {
 	private StatusRepository statusRepository;
 
 	@Autowired
+	private StatusService service;
+
+	@Autowired
 	private ObjectMapper objectMapper;
 
 	@Autowired
@@ -58,7 +62,7 @@ class StatusControllerTest {
 
 	private JwtRequestPostProcessor tokenFailed;
 
-	private Status status;
+	private StatusDTO status;
 
 //	private List<Status> statusList;
 
@@ -73,10 +77,9 @@ class StatusControllerTest {
 
 		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
-		status = Instancio.of(generator.getStatusModel()).create();
+		var dto = Instancio.of(generator.getStatusModel()).create();
+		status = service.createStatus(dto);
 //		statusList = generator.getStatusModelList().stream().map(Instancio::create).toList();
-
-		statusRepository.save(status);
 	}
 
 	@AfterEach

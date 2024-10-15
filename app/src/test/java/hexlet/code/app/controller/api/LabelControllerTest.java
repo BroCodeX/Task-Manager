@@ -2,10 +2,12 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.app.dto.label.LabelCreateDTO;
 import hexlet.code.app.dto.label.LabelDTO;
 import hexlet.code.app.mapper.LabelMapper;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.repository.LabelRepository;
+import hexlet.code.app.service.LabelService;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
@@ -55,12 +57,15 @@ public class LabelControllerTest {
     @Autowired
     private LabelMapper mapper;
 
+    @Autowired
+    private LabelService labelService;
+
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor tokenFailed;
 
-    private Label label;
+    private LabelDTO label;
 
-    private List<Label> labelList;
+    private List<LabelCreateDTO> labelList;
 
     @BeforeEach
     void prepare() {
@@ -72,9 +77,9 @@ public class LabelControllerTest {
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
         tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
-        label = Instancio.of(generator.getLabelModel()).create();
+        var dto = Instancio.of(generator.getLabelModel()).create();
 
-        repository.save(label);
+        label = labelService.createLabel(dto);
 
         labelList = generator.getLabelList().stream()
                 .map(Instancio::create)
@@ -88,7 +93,7 @@ public class LabelControllerTest {
 
     @Test
     void indexTest() throws Exception {
-        labelList.forEach(repository::save);
+        labelList.forEach(labelService::createLabel);
 
         var request = get("/api/labels")
                 .with(token);
@@ -107,7 +112,7 @@ public class LabelControllerTest {
 
     @Test
     void showTest() throws Exception {
-        long id = label.getId();;
+        long id = label.getId();
 
         var request = get("/api/labels/{id}", id)
                 .with(token);
@@ -164,6 +169,8 @@ public class LabelControllerTest {
 
     @Test
     void createTestFailedData() throws Exception {
+        var dto = new LabelCreateDTO();
+        dto.setName("ss");
         Map<String, String> refData = new HashMap<>();
         refData.put("name", "12");
 

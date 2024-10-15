@@ -43,7 +43,7 @@ public class LabelController {
         return service.showLabel(id);
     }
 
-    @PostMapping("/{id}")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     public LabelDTO create(@Valid @RequestBody LabelCreateDTO dto) {

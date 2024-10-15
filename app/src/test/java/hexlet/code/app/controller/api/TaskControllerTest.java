@@ -2,10 +2,12 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.app.dto.task.TaskCreateDTO;
 import hexlet.code.app.dto.task.TaskDTO;
 import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.repository.TaskRepository;
+import hexlet.code.app.service.TaskService;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +50,9 @@ class TaskControllerTest {
 	private ObjectMapper objectMapper;
 
 	@Autowired
+	private TaskService service;
+
+	@Autowired
 	private TaskMapper mapper;
 
 	@Autowired
@@ -57,9 +62,9 @@ class TaskControllerTest {
 
 	private JwtRequestPostProcessor tokenFailed;
 
-	private Task task;
+	private TaskDTO task;
 
-	private List<Task> taskList;
+	private List<TaskCreateDTO> taskList;
 
 	@BeforeEach
 	void prepare() {
@@ -73,8 +78,9 @@ class TaskControllerTest {
 
 		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
-		task = Instancio.of(generator.makeFakeTask()).create();
-		repository.save(task);
+		var dto = Instancio.of(generator.makeFakeTask()).create();
+
+		task = service.createTask(dto);
 
 		taskList = generator.getTaskList().stream()
 						.map(Instancio::create)
@@ -83,7 +89,7 @@ class TaskControllerTest {
 
 	@Test
 	void indexTest() throws Exception {
-		taskList.forEach(repository::save);
+		taskList.forEach(service::createTask);
 
 		var request = get("/api/tasks").with(token);
 		var response = mockMvc.perform(request)
@@ -112,8 +118,8 @@ class TaskControllerTest {
 
 		assertThat(testTask).isNotEmpty();
 		assertThatJson(body).and(
-				n -> n.node("title").isEqualTo(task.getName()),
-				n -> n.node("content").isEqualTo(task.getDescription())
+				n -> n.node("title").isEqualTo(task.getTitle()),
+				n -> n.node("content").isEqualTo(task.getContent())
 		);
 	}
 
