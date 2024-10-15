@@ -2,7 +2,7 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.app.dto.StatusDTO;
+import hexlet.code.app.dto.status.StatusDTO;
 import hexlet.code.app.mapper.StatusMapper;
 import hexlet.code.app.model.Status;
 import hexlet.code.app.repository.StatusRepository;

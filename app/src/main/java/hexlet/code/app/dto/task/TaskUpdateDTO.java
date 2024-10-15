@@ -1,9 +1,11 @@
-package hexlet.code.app.dto;
+package hexlet.code.app.dto.task;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.jackson.nullable.JsonNullable;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -14,5 +16,5 @@ public class TaskUpdateDTO {
     private JsonNullable<String> content;
     private JsonNullable<String> status;
 
-    private JsonNullable<String> label;
+    private JsonNullable<List<String>> labels;
 }

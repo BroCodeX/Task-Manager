@@ -1,8 +1,8 @@
 package hexlet.code.app.mapper;
 
-import hexlet.code.app.dto.TaskCreateDTO;
-import hexlet.code.app.dto.TaskDTO;
-import hexlet.code.app.dto.TaskUpdateDTO;
+import hexlet.code.app.dto.task.TaskCreateDTO;
+import hexlet.code.app.dto.task.TaskDTO;
+import hexlet.code.app.dto.task.TaskUpdateDTO;
 import hexlet.code.app.model.Task;
 import org.mapstruct.*;
 
@@ -19,22 +19,26 @@ public abstract class TaskMapper {
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
     @Mapping(source = "status", target = "taskStatus", qualifiedByName = "toStatusEntity")
+    @Mapping(source = "label", target = "labels", qualifiedByName = "toLabelEntities")
     public abstract Task map(TaskDTO dto);
 
     @Mapping(target = "assignee_id", source = "assignee.id")
     @Mapping(target = "title", source = "name")
     @Mapping(target = "content", source = "description")
     @Mapping(target = "status", source = "taskStatus.name")
+    @Mapping(target = "label", source = "labels") // тут надо подумать
     public abstract TaskDTO map(Task task);
 
     @Mapping(source = "assignee_id", target = "assignee")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
     @Mapping(source = "status", target = "taskStatus", qualifiedByName = "toStatusEntity")
+    @Mapping(source = "label", target = "labels", qualifiedByName = "toLabelEntities")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
     @Mapping(source = "status", target = "taskStatus", qualifiedByName = "toStatusEntity")
+    @Mapping(source = "label", target = "labels", qualifiedByName = "toLabelEntities")
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task task);
 }

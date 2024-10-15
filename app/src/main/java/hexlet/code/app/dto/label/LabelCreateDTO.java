@@ -1,19 +1,14 @@
-package hexlet.code.app.dto;
+package hexlet.code.app.dto.label;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
-public class StatusCreateDTO {
+public class LabelCreateDTO {
     @NotBlank
-    @Size(min = 1)
+    @Size(min = 3, max = 1000)
     private String name;
-
-    @NotBlank
-    @Size(min = 1)
-    private String slug;
 }

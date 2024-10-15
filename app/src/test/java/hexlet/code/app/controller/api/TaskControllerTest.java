@@ -2,7 +2,7 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.app.dto.TaskDTO;
+import hexlet.code.app.dto.task.TaskDTO;
 import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.repository.TaskRepository;
