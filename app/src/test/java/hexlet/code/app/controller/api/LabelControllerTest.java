@@ -83,7 +83,7 @@ public class LabelControllerTest {
 
     @AfterEach
     void cleanRepo() {
-        repository.deleteAll();
+        repository.deleteById(label.getId());
     }
 
     @Test

@@ -19,4 +19,6 @@ public class TaskCreateDTO {
 
     @NotBlank
     private String status;
+
+    private String label;
 }

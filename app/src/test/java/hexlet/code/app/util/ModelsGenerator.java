@@ -43,22 +43,22 @@ public class ModelsGenerator {
     @PostConstruct
     public void initData() {
         userModel =  makeFakeUser();
-        userModelList = IntStream.range(0, 6)
+        userModelList = IntStream.range(0, 5)
                 .mapToObj(i -> makeFakeUser())
                 .collect(Collectors.toList());
 
         statusModel = makeFakeStatus();
-        statusModelList = IntStream.range(0, 6)
+        statusModelList = IntStream.range(0, 5)
                 .mapToObj(i -> makeFakeStatus())
                 .toList();
 
         taskModel = makeFakeTask();
-        taskList = IntStream.range(0, 6)
+        taskList = IntStream.range(0, 5)
                 .mapToObj(i -> makeFakeTask())
                 .toList();
 
         labelModel = makeFakeLabel();
-        labelList = IntStream.range(0, 6)
+        labelList = IntStream.range(0, 5)
                 .mapToObj(i -> makeFakeLabel())
                 .toList();
 
@@ -97,7 +97,7 @@ public class ModelsGenerator {
         return Instancio.of(Label.class)
                 .ignore(Select.field(Label::getId))
                 .ignore(Select.field(Label::getTasks))
-                .supply(Select.field(Label::getName), () -> faker.lebowski().character())
+                .supply(Select.field(Label::getName), () -> faker.funnyName().name())
                 .toModel();
     }
 }
