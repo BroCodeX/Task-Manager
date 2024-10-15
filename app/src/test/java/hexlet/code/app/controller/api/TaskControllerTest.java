@@ -131,10 +131,11 @@ class TaskControllerTest {
 
 	@Test
 	void createTest() throws Exception {
-		Map<String, String> refData = new HashMap<>();
+		Map<String, Object> refData = new HashMap<>();
 		refData.put("title", "yandex-name-create");
 		refData.put("content", "yandex-description-create");
 		refData.put("status", "Draft");
+		refData.put("labels", List.of("bug"));
 
 		var request = post("/api/tasks")
 				.with(token)
@@ -144,7 +145,7 @@ class TaskControllerTest {
 				.andExpect(status().isCreated())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
-		var testTask = repository.findByName(refData.get("title")).orElse(null);
+		var testTask = repository.findByName("yandex-name-create").orElse(null);
 
 		assertThat(testTask).isNotNull();
 		assertThatJson(body).and(

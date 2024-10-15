@@ -22,5 +22,5 @@ public class TaskCreateDTO {
     @NotBlank
     private String status;
 
-    private List<String> label;
+    private List<String> labels;
 }

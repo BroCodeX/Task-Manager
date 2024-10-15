@@ -42,7 +42,16 @@ public class ReferenceMapper {
     }
 
     @Named("toLabelEntities")
-    public List<Label> toLabelEntities(String label) {
-        return labelRepository.findAll();
+    public List<Label> toLabelEntities(List<String> labels) {
+        return labels.stream()
+                .map(this::toLabelEntity)
+                .toList();
+    }
+
+    @Named("toLabelNames")
+    public List<String> toLabelNames(List<Label> labels) {
+        return labels.stream()
+                .map(Label::getName)
+                .toList();
     }
 }
