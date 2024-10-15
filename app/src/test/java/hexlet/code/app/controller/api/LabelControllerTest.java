@@ -139,7 +139,7 @@ public class LabelControllerTest {
         Map<String, String> refData = new HashMap<>();
         refData.put("name", "yandex-name-label");
 
-        var request = post("/api/labels/")
+        var request = post("/api/labels")
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(refData));
@@ -162,7 +162,7 @@ public class LabelControllerTest {
         Map<String, String> refData = new HashMap<>();
         refData.put("name", "");
 
-        var request = post("/api/labels/")
+        var request = post("/api/labels")
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(refData));
