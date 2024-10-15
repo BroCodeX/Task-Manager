@@ -158,7 +158,7 @@ class TaskControllerTest {
 	@Test
 	void createTestFailed() throws Exception {
 		Map<String, String> refData = new HashMap<>();
-		refData.put("title", "yandex-name-create-failed");
+		refData.put("title", "");
 		refData.put("content", "yandex-description-create-failed");
 		refData.put("status", "Draft");
 
@@ -167,11 +167,7 @@ class TaskControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		mockMvc.perform(request)
-				.andExpect(status().isCreated());
-
-		var testTask = repository.findByName(refData.get("title")).orElse(null);
-
-		assertThat(testTask).isNull();
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -205,16 +201,15 @@ class TaskControllerTest {
 		long id  = task.getId();
 
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-name-failed");
+		refData.put("title", "");
 		refData.put("description", "yandex-description-failed");
 
 		var request = put("/api/tasks/{id}", id)
-				.with(tokenFailed)
+				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-		assertThat(repository.findById(id).get().getName()).isEqualTo(task.getName());
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test

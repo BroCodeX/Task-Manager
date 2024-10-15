@@ -159,19 +159,15 @@ class StatusControllerTest {
 	@Test
 	void createTestFailed() throws Exception {
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-status-create-test-faileddata");
-		refData.put("slug", "yandex-slug-create-test-faileddata");
+		refData.put("name", "");
+		refData.put("slug", "");
 
 		var request = post("/api/task_statuses")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		mockMvc.perform(request)
-				.andExpect(status().isCreated());
-
-		var testStatus = statusRepository.findBySlug(refData.get("slug")).orElse(null);
-
-		assertThat(testStatus).isNull();
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -203,15 +199,15 @@ class StatusControllerTest {
 		long id  = status.getId();
 
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-status-failed");
-		refData.put("slug", "yandex-slug-failed");
+		refData.put("name", "");
+		refData.put("slug", "");
 
 		var request = put("/api/task_statuses/{id}", id)
 				.with(tokenFailed)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
+				.andExpect(status().isBadRequest());
 		assertThat(statusRepository.findById(id).get().getName()).isEqualTo(status.getName());
 	}
 

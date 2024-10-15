@@ -8,6 +8,7 @@ import hexlet.code.app.model.Label;
 import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,6 @@ import java.util.Map;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -79,6 +79,11 @@ public class LabelControllerTest {
         labelList = generator.getLabelList().stream()
                 .map(Instancio::create)
                 .toList();
+    }
+
+    @AfterEach
+    void cleanRepo() {
+        repository.deleteAll();
     }
 
     @Test
@@ -160,7 +165,7 @@ public class LabelControllerTest {
     @Test
     void createTestFailedData() throws Exception {
         Map<String, String> refData = new HashMap<>();
-        refData.put("name", "");
+        refData.put("name", "12");
 
         var request = post("/api/labels")
                 .with(token)
@@ -168,7 +173,7 @@ public class LabelControllerTest {
                 .content(objectMapper.writeValueAsString(refData));
 
         mockMvc.perform(request)
-                .andExpect(status().isCreated());
+                .andExpect(status().isBadRequest());
 
         var maybeLabel = repository.findByName(refData.get("name")).orElse(null);
 
@@ -213,7 +218,7 @@ public class LabelControllerTest {
                 .content(objectMapper.writeValueAsString(refData));
 
         mockMvc.perform(request)
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest());
 
         var maybeLabel = repository.findById(id).get();
         var failedLabel = repository.findByName(refData.get("name")).orElse(null);

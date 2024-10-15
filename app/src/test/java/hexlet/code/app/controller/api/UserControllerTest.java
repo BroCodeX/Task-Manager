@@ -8,6 +8,7 @@ import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -80,22 +82,27 @@ class UserControllerTest {
 		userRepository.save(user);
 	}
 
+	@AfterEach
+	void cleanRepo() {
+		userRepository.deleteAll();
+	}
+
 
 	@Test
 	void loginTest() throws Exception {
 		Map<String, String> logData = new HashMap<>();
-		logData.put("email", "noexist@test.com");
+		logData.put("username", "noexist@google.com");
 		logData.put("password", "noexist");
-		token = jwt().jwt(builder -> builder.subject(logData.get("email")));
+		token = jwt().jwt(builder -> builder.subject(logData.get("username")));
 		var request = post("/api/login")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(logData));
 
-		var response = mockMvc.perform(request)
+		mockMvc.perform(request)
 				.andExpect(status().isUnauthorized());
 
-		assertThat(userRepository.findByEmail(logData.get("email"))).isEmpty();
+		assertThat(userRepository.findByEmail(logData.get("username"))).isEmpty();
 	}
 
 	@Test
@@ -172,6 +179,25 @@ class UserControllerTest {
 				n -> n.node("firstName").isEqualTo(refData.get("firstName")),
 				n -> n.node("lastName").isEqualTo(refData.get("lastName"))
 		);
+	}
+
+	@Test
+	void createTestFailed() throws Exception {
+		Map<String, String> refData = new HashMap<>();
+		refData.put("email", "yandextestcreate");
+		refData.put("firstName", "yandexfirstName@test.com");
+		refData.put("lastName", "yandexlastName@test.com");
+		refData.put("password", "yandexPass");
+
+		var request = post("/api/users")
+				.with(token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(refData));
+		mockMvc.perform(request)
+				.andExpect(status().isBadRequest());
+		var testUser = userRepository.findByEmail(refData.get("email")).orElse(null);
+
+		assertNull(testUser);
 	}
 
 	@Test
