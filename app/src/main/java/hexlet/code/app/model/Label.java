@@ -2,7 +2,6 @@ package hexlet.code.app.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,43 +10,33 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "tasks")
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "labels")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Setter
-@EntityListeners(AuditingEntityListener.class)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Task implements BaseEntity {
+public class Label implements BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
 
     @NotBlank
-    @Size(min = 1)
-    @Column(name = "title")
+    @Size(min = 3, max = 1000)
+    @Column(unique = true)
     private String name;
-
-    private Integer index;
-
-    @Column(name = "content")
-    private String description;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "status_id", nullable = false)
-    private Status taskStatus;
-
-    @ManyToOne
-    @JoinColumn(name = "assignee_id")
-    private User assignee;
 
     @CreatedDate
     private LocalDate createdAt;
 
-    @ManyToMany(mappedBy = "tasks")
-    private List<Label> labels = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "label_task",
+            joinColumns = @JoinColumn(name = "label_id"),
+            inverseJoinColumns = @JoinColumn(name = "task_id")
+    )
+    private List<Task> tasks;
 }

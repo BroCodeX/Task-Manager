@@ -1,11 +1,15 @@
 package hexlet.code.app.component;
 
-import hexlet.code.app.dto.StatusCreateDTO;
-import hexlet.code.app.dto.UserCreateDTO;
+import hexlet.code.app.dto.label.LabelCreateDTO;
+import hexlet.code.app.dto.status.StatusCreateDTO;
+import hexlet.code.app.dto.user.UserCreateDTO;
 import hexlet.code.app.mapper.UserMapper;
+import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Status;
+import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.StatusRepository;
 import hexlet.code.app.repository.UserRepository;
+import hexlet.code.app.service.LabelService;
 import hexlet.code.app.service.StatusService;
 import hexlet.code.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +42,17 @@ public class InitData implements ApplicationRunner {
     @Autowired
     private StatusService statusService;
 
+    @Autowired
+    private LabelService labelService;
+
+    @Autowired
+    private LabelRepository labelRepository;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         initUser();
         initStatuses();
+        initLabels();
     }
 
     public void initUser() {
@@ -69,5 +80,20 @@ public class InitData implements ApplicationRunner {
                 .map(Status::getName)
                 .toList();
         System.out.println("Init statuses: " + checkTitles + " created");
+    }
+
+    public void initLabels() {
+        List<String> labels = List.of("feature", "bug");
+        List<LabelCreateDTO> labelCreateDTOS = IntStream.range(0, labels.size())
+                .mapToObj(i -> {
+                    var dto = new LabelCreateDTO();
+                    dto.setName(labels.get(i));
+                    return dto;
+                }).toList();
+        labelCreateDTOS.forEach(labelService::createLabel);
+        var checkLables = labelRepository.findAll().stream()
+                .map(Label::getName)
+                .toList();
+        System.out.println("Init labels: " + checkLables + " created");
     }
 }

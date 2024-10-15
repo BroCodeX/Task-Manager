@@ -1,10 +1,9 @@
 package hexlet.code.app.controller.api;
 
-import hexlet.code.app.dto.task.TaskCreateDTO;
-import hexlet.code.app.dto.task.TaskDTO;
-import hexlet.code.app.dto.task.TaskUpdateDTO;
-import hexlet.code.app.mapper.TaskMapper;
-import hexlet.code.app.service.TaskService;
+import hexlet.code.app.dto.label.LabelCreateDTO;
+import hexlet.code.app.dto.label.LabelDTO;
+import hexlet.code.app.dto.label.LabelUpdateDTO;
+import hexlet.code.app.service.LabelService;
 import hexlet.code.app.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,54 +16,51 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks")
-public class TaskController {
+@RequestMapping("/api/labels")
+public class LabelController {
+    @Autowired
+    private LabelService service;
+
     @Autowired
     private UserUtils userUtils;
-
-    @Autowired
-    private TaskService service;
-
-    @Autowired
-    private TaskMapper mapper;
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public ResponseEntity<List<TaskDTO>> index(@RequestParam(defaultValue = "10") Integer limit) {
-        var tasks = service.getAll(limit);
+    public ResponseEntity<List<LabelDTO>> index(@RequestParam(defaultValue = "10") Integer limit) {
+        var labels = service.getAll(limit);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(tasks.size()));
+        headers.add("X-Total-Count", String.valueOf(labels.size()));
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(tasks);
+                .body(labels);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public TaskDTO show(@Valid @PathVariable Long id) {
-        return service.showTask(id);
+    public LabelDTO show(@PathVariable Long id) {
+        return service.showLabel(id);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public TaskDTO create(@Valid @RequestBody TaskCreateDTO dto) {
-        return service.createTask(dto);
+    public LabelDTO create(@Valid @RequestBody LabelCreateDTO dto) {
+        return service.createLabel(dto);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public TaskDTO update(@Valid @RequestBody TaskUpdateDTO dto, @PathVariable Long id) {
-        return service.updateTask(dto, id);
+    public LabelDTO update(@Valid @RequestBody LabelUpdateDTO dto, @PathVariable Long id) {
+        return service.updateLabel(dto, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public void destroy(@PathVariable Long id) {
-        service.destroyTask(id);
+    public void destroy(@PathVariable long id) {
+        service.destroyLabel(id);
     }
 }

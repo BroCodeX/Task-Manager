@@ -1,8 +1,8 @@
 package hexlet.code.app.controller.api;
 
-import hexlet.code.app.dto.StatusCreateDTO;
-import hexlet.code.app.dto.StatusDTO;
-import hexlet.code.app.dto.StatusUpdateDTO;
+import hexlet.code.app.dto.status.StatusCreateDTO;
+import hexlet.code.app.dto.status.StatusDTO;
+import hexlet.code.app.dto.status.StatusUpdateDTO;
 import hexlet.code.app.service.StatusService;
 import hexlet.code.app.util.UserUtils;
 import jakarta.validation.Valid;

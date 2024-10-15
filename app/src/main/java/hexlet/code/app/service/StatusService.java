@@ -1,8 +1,8 @@
 package hexlet.code.app.service;
 
-import hexlet.code.app.dto.StatusCreateDTO;
-import hexlet.code.app.dto.StatusDTO;
-import hexlet.code.app.dto.StatusUpdateDTO;
+import hexlet.code.app.dto.status.StatusCreateDTO;
+import hexlet.code.app.dto.status.StatusDTO;
+import hexlet.code.app.dto.status.StatusUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.mapper.StatusMapper;
 import hexlet.code.app.repository.StatusRepository;

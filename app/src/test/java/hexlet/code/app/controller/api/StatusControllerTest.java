@@ -2,10 +2,11 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.app.dto.StatusDTO;
+import hexlet.code.app.dto.status.StatusDTO;
 import hexlet.code.app.mapper.StatusMapper;
 import hexlet.code.app.model.Status;
 import hexlet.code.app.repository.StatusRepository;
+import hexlet.code.app.service.StatusService;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
@@ -46,6 +47,9 @@ class StatusControllerTest {
 	private StatusRepository statusRepository;
 
 	@Autowired
+	private StatusService service;
+
+	@Autowired
 	private ObjectMapper objectMapper;
 
 	@Autowired
@@ -58,7 +62,7 @@ class StatusControllerTest {
 
 	private JwtRequestPostProcessor tokenFailed;
 
-	private Status status;
+	private StatusDTO status;
 
 //	private List<Status> statusList;
 
@@ -73,10 +77,9 @@ class StatusControllerTest {
 
 		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
-		status = Instancio.of(generator.getStatusModel()).create();
+		var dto = Instancio.of(generator.getStatusModel()).create();
+		status = service.createStatus(dto);
 //		statusList = generator.getStatusModelList().stream().map(Instancio::create).toList();
-
-		statusRepository.save(status);
 	}
 
 	@AfterEach
@@ -157,6 +160,20 @@ class StatusControllerTest {
 	}
 
 	@Test
+	void createTestFailed() throws Exception {
+		Map<String, String> refData = new HashMap<>();
+		refData.put("name", "");
+		refData.put("slug", "");
+
+		var request = post("/api/task_statuses")
+				.with(token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(refData));
+		mockMvc.perform(request)
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
 	void updateTest() throws Exception {
 		long id  = status.getId();
 
@@ -185,15 +202,15 @@ class StatusControllerTest {
 		long id  = status.getId();
 
 		Map<String, String> refData = new HashMap<>();
-		refData.put("name", "yandex-status-failed");
-		refData.put("slug", "yandex-slug-failed");
+		refData.put("name", "");
+		refData.put("slug", "");
 
 		var request = put("/api/task_statuses/{id}", id)
 				.with(tokenFailed)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
+				.andExpect(status().isBadRequest());
 		assertThat(statusRepository.findById(id).get().getName()).isEqualTo(status.getName());
 	}
 
