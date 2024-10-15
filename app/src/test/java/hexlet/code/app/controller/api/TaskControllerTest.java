@@ -154,6 +154,26 @@ class TaskControllerTest {
 		);
 	}
 
+
+	@Test
+	void createTestFailed() throws Exception {
+		Map<String, String> refData = new HashMap<>();
+		refData.put("title", "yandex-name-create-failed");
+		refData.put("content", "yandex-description-create-failed");
+		refData.put("status", "Draft");
+
+		var request = post("/api/tasks")
+				.with(token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(refData));
+		mockMvc.perform(request)
+				.andExpect(status().isCreated());
+
+		var testTask = repository.findByName(refData.get("title")).orElse(null);
+
+		assertThat(testTask).isNull();
+	}
+
 	@Test
 	void updateTest() throws Exception {
 		long id  = task.getId();

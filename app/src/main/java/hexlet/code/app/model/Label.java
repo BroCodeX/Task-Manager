@@ -33,6 +33,6 @@ public class Label implements BaseEntity {
     private LocalDate createdAt;
 
     @ManyToMany
-    @JoinColumn(name = "task_id")
+    @JoinColumn(name = "task_id", unique = true)
     private List<Task> tasks;
 }

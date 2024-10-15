@@ -157,6 +157,24 @@ class StatusControllerTest {
 	}
 
 	@Test
+	void createTestFailed() throws Exception {
+		Map<String, String> refData = new HashMap<>();
+		refData.put("name", "yandex-status-create-test-faileddata");
+		refData.put("slug", "yandex-slug-create-test-faileddata");
+
+		var request = post("/api/task_statuses")
+				.with(token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(refData));
+		mockMvc.perform(request)
+				.andExpect(status().isCreated());
+
+		var testStatus = statusRepository.findBySlug(refData.get("slug")).orElse(null);
+
+		assertThat(testStatus).isNull();
+	}
+
+	@Test
 	void updateTest() throws Exception {
 		long id  = status.getId();
 

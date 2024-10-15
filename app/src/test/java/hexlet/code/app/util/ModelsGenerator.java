@@ -1,5 +1,6 @@
 package hexlet.code.app.util;
 
+import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Status;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.User;
@@ -36,6 +37,8 @@ public class ModelsGenerator {
     private List<Model<Status>> statusModelList;
     private Model<Task> taskModel;
     private List<Model<Task>> taskList;
+    private Model<Label> labelModel;
+    private List<Model<Label>> labelList;
 
     @PostConstruct
     public void initData() {
@@ -53,6 +56,12 @@ public class ModelsGenerator {
         taskList = IntStream.range(0, 6)
                 .mapToObj(i -> makeFakeTask())
                 .toList();
+
+        labelModel = makeFakeLabel();
+        labelList = IntStream.range(0, 6)
+                .mapToObj(i -> makeFakeLabel())
+                .toList();
+
     }
 
     public Model<User> makeFakeUser() {
@@ -81,6 +90,14 @@ public class ModelsGenerator {
                 .supply(Select.field(Task::getDescription), () -> faker.esports().game())
                 .supply(Select.field(Task::getTaskStatus), () -> statusRepository.findByName("Draft").get())
                 .supply(Select.field(Task::getIndex), () -> Integer.valueOf(faker.number().digit()))
+                .toModel();
+    }
+
+    public Model<Label> makeFakeLabel() {
+        return Instancio.of(Label.class)
+                .ignore(Select.field(Label::getId))
+                .ignore(Select.field(Label::getTasks))
+                .supply(Select.field(Label::getName), () -> faker.lebowski().character())
                 .toModel();
     }
 }
