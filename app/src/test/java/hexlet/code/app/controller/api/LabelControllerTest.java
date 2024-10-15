@@ -169,8 +169,6 @@ public class LabelControllerTest {
 
     @Test
     void createTestFailedData() throws Exception {
-        var dto = new LabelCreateDTO();
-        dto.setName("ss");
         Map<String, String> refData = new HashMap<>();
         refData.put("name", "12");
 
@@ -217,7 +215,7 @@ public class LabelControllerTest {
         long id = label.getId();
 
         Map<String, String> refData = new HashMap<>();
-        refData.put("name", "ff");
+        refData.put("name", "yy");
 
         var request = put("/api/labels/{id}", id)
                 .with(token)
