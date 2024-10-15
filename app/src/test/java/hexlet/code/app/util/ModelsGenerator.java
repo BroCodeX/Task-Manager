@@ -89,9 +89,9 @@ public class ModelsGenerator {
                 .ignore(Select.field(TaskCreateDTO::getAssignee_id))
                 .supply(Select.field(TaskCreateDTO::getTitle), () -> faker.funnyName().name())
                 .supply(Select.field(TaskCreateDTO::getContent), () -> faker.esports().game())
-                .supply(Select.field(TaskCreateDTO::getStatus), () -> "Draft")
+                .supply(Select.field(TaskCreateDTO::getStatus), () -> "draft")
                 .supply(Select.field(TaskCreateDTO::getIndex), () -> Integer.valueOf(faker.number().digit()))
-                .supply(Select.field(TaskCreateDTO::getLabels), () -> List.of(1L))
+                .supply(Select.field(TaskCreateDTO::getTaskLabelIds), () -> List.of(1L))
                 .toModel();
     }
 

@@ -140,7 +140,7 @@ class TaskControllerTest {
 		Map<String, Object> refData = new HashMap<>();
 		refData.put("title", "yandex-name-create");
 		refData.put("content", "yandex-description-create");
-		refData.put("status", "Draft");
+		refData.put("status", "draft");
 		refData.put("labels", List.of(1L));
 
 		var request = post("/api/tasks")
@@ -157,7 +157,7 @@ class TaskControllerTest {
 		assertThatJson(body).and(
 				n -> n.node("title").isEqualTo(refData.get("title")),
 				n -> n.node("content").isEqualTo(refData.get("content")),
-				n -> n.node("status").isEqualTo(refData.get("status"))
+				n -> n.node("status").isEqualTo("Draft")
 		);
 	}
 
@@ -184,7 +184,7 @@ class TaskControllerTest {
 		Map<String, String> refData = new HashMap<>();
 		refData.put("title", "yandex-name-update");
 		refData.put("content", "yandex-description-update");
-		refData.put("status", "To Review");
+		refData.put("status", "to_review");
 
 		var request = put("/api/tasks/{id}", id)
 				.with(token)
@@ -198,7 +198,7 @@ class TaskControllerTest {
 		assertThatJson(body).and(
 				n -> n.node("title").isEqualTo(refData.get("title")),
 				n -> n.node("content").isEqualTo(refData.get("content")),
-				n -> n.node("status").isEqualTo(refData.get("status"))
+				n -> n.node("status").isEqualTo("To Review")
 		);
 		assertThat(repository.findById(id).get().getName()).isEqualTo(refData.get("title"));
 	}

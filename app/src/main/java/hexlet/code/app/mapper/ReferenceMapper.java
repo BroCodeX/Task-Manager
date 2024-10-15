@@ -34,8 +34,8 @@ public class ReferenceMapper {
     }
 
     @Named("toStatusEntity")
-    public Status toStatusEntity(String name) {
-        return statusRepository.findByName(name).orElse(null);
+    public Status toStatusEntity(String slug) {
+        return statusRepository.findBySlug(slug).orElse(null);
     }
 
     @Named("toLabelEntity")

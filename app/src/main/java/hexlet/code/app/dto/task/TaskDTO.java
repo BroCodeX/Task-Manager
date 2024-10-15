@@ -17,5 +17,5 @@ public class TaskDTO {
     private String title;
     private String content;
     private String status;
-    private List<Long> labels;
+    private List<Long> taskLabelIds;
 }
