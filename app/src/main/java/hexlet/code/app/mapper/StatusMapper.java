@@ -4,7 +4,11 @@ import hexlet.code.app.dto.status.StatusCreateDTO;
 import hexlet.code.app.dto.status.StatusDTO;
 import hexlet.code.app.dto.status.StatusUpdateDTO;
 import hexlet.code.app.model.Status;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.MappingTarget;
 
 @Mapper(
         uses = {JsonNullableMapper.class},

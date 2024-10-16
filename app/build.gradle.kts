@@ -97,3 +97,8 @@ tasks.jacocoTestReport {
 application {
 	mainClass.set("hexlet.code.app.AppApplication")
 }
+
+checkstyle {
+	toolVersion = "10.18.2"
+	configFile = file("config/checkstyle/checkstyle.xml")
+}

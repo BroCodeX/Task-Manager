@@ -109,14 +109,14 @@ class TaskControllerTest {
 	@Test
 	void indexFilterTest() throws Exception {
 		var task1 = new TaskCreateDTO();
-		task1.setAssignee_id(1L);
+		task1.setAssigneeID(1L);
 		task1.setTitle("Task One is finally in the house");
 		task1.setContent("The description of the task One");
 		task1.setStatus("to_be_fixed");
 		task1.setTaskLabelIds(List.of(1L));
 
 		var task2 = new TaskCreateDTO();
-		task2.setAssignee_id(1L);
+		task2.setAssigneeID(1L);
 		task2.setTitle("Task Two has already in the house");
 		task2.setContent("The description of the task Two");
 		task2.setStatus("to_be_fixed");
@@ -129,10 +129,10 @@ class TaskControllerTest {
 		taskIds.add(savedTwo.getId());
 
 		var request = get("/api/tasks").with(token)
-				.param("titleCont", "in the house")
-				.param("assigneeId", "1")
-				.param("status", "to_be_fixed")
-				.param("labelId", "1");
+				.queryParam("titleCont", "in the house")
+				.queryParam("assigneeId", "1")
+				.queryParam("status", "to_be_fixed")
+				.queryParam("labelId", "1");
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
