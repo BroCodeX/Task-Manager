@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 public class TaskCreateDTO {
     private Integer index;
-    private Long assigneeID;
+    private Long assigneeId;
     private String content;
 
     @NotBlank

@@ -109,14 +109,14 @@ class TaskControllerTest {
 	@Test
 	void indexFilterTest() throws Exception {
 		var task1 = new TaskCreateDTO();
-		task1.setAssigneeID(1L);
+		task1.setAssigneeId(1L);
 		task1.setTitle("Task One is finally in the house");
 		task1.setContent("The description of the task One");
 		task1.setStatus("to_be_fixed");
 		task1.setTaskLabelIds(List.of(1L));
 
 		var task2 = new TaskCreateDTO();
-		task2.setAssigneeID(1L);
+		task2.setAssigneeId(1L);
 		task2.setTitle("Task Two has already in the house");
 		task2.setContent("The description of the task Two");
 		task2.setStatus("to_be_fixed");
