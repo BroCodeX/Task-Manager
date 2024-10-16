@@ -124,9 +124,9 @@ class TaskControllerTest {
 
 		var savedOne = service.createTask(task1);
 		var savedTwo = service.createTask(task2);
-		List<Long> ids = new ArrayList<>();
-		ids.add(savedOne.getId());
-		ids.add(savedTwo.getId());
+		List<Long> taskIds = new ArrayList<>();
+		taskIds.add(savedOne.getId());
+		taskIds.add(savedTwo.getId());
 
 		var request = get("/api/tasks").with(token)
 				.param("titleCont", "in the house")
@@ -140,7 +140,7 @@ class TaskControllerTest {
 
 		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() {});
 		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
-		List<Task> expected = repository.findAllById(ids);
+		List<Task> expected = repository.findAllById(taskIds);
 
 		assertThatJson(body).isArray();
 		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);

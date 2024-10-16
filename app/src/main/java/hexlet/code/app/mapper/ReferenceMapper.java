@@ -47,14 +47,14 @@ public class ReferenceMapper {
 
     @Named("toLabelEntities")
     public List<Label> toLabelEntities(List<Long> labelsIDs) {
-        return labelsIDs == null ? new ArrayList<>() : labelsIDs.stream()
+        return labelsIDs == null || labelsIDs.isEmpty() ? new ArrayList<>() : labelsIDs.stream()
                 .map(this::toLabelEntity)
                 .toList();
     }
 
     @Named("toLabelNames")
     public List<Long> toLabelNames(List<Label> labels) {
-        return labels == null ? new ArrayList<>() :labels.stream()
+        return labels == null || labels.isEmpty() ? new ArrayList<>() : labels.stream()
                 .map(Label::getId)
                 .toList();
     }
