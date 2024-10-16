@@ -131,8 +131,8 @@ class TaskControllerTest {
 		var request = get("/api/tasks").with(token)
 				.param("titleCont", "in the house")
 				.param("assigneeId", "1")
-				.param("status", "to_be_fixed");
-				//.param("labelId", "1");
+				.param("status", "to_be_fixed")
+				.param("labelId", "1");
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
@@ -141,6 +141,8 @@ class TaskControllerTest {
 		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() {});
 		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
 		List<Task> expected = repository.findAllById(ids);
+
+		actual.forEach(i -> System.out.println("AACCTT " + i.getName()));
 
 		assertThatJson(body).isArray();
 		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
