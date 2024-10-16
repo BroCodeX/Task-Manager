@@ -2,6 +2,7 @@ package hexlet.code.app.controller.api;
 
 import hexlet.code.app.dto.task.TaskCreateDTO;
 import hexlet.code.app.dto.task.TaskDTO;
+import hexlet.code.app.dto.task.TaskFilterDTO;
 import hexlet.code.app.dto.task.TaskUpdateDTO;
 import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.service.TaskService;
@@ -31,8 +32,9 @@ public class TaskController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public ResponseEntity<List<TaskDTO>> index(@RequestParam(defaultValue = "10") Integer limit) {
-        var tasks = service.getAll(limit);
+    public ResponseEntity<List<TaskDTO>> index(@ModelAttribute TaskFilterDTO filterDTO,
+                                               @RequestParam(defaultValue = "1") Integer limit) {
+        var tasks = service.getAll(filterDTO, limit);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(tasks.size()));
         return ResponseEntity.ok()
