@@ -14,10 +14,10 @@ public class TaskSpecification {
                 .and(withLabelId(params.getLabelId()));
     }
 
-    public Specification<Task> withTitleCont(String taskTitle) {
-        return (root, query, cb) -> taskTitle.isBlank()
+    public Specification<Task> withTitleCont(String titleCont) {
+        return (root, query, cb) -> titleCont == null || titleCont.isBlank()
                 ? cb.conjunction()
-                : cb.equal(root.get("name"), taskTitle);
+                : cb.like(cb.lower(root.get("name")), "%" + titleCont.toLowerCase().trim() + "%");
     }
 
     public Specification<Task> withAssigneeId(Long assigneeId) {
@@ -27,9 +27,9 @@ public class TaskSpecification {
     }
 
     public Specification<Task> withSlug(String slug) {
-        return (root, query, cb) -> slug.isBlank()
+        return (root, query, cb) -> slug == null || slug.isBlank()
                 ? cb.conjunction()
-                : cb.equal(root.get("Status").get("slug"), slug);
+                : cb.equal(root.get("taskStatus").get("slug"), slug);
     }
 
     public Specification<Task> withLabelId(Long labelId) {

@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +101,46 @@ class TaskControllerTest {
 		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() {});
 		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
 		List<Task> expected = repository.findAll();
+
+		assertThatJson(body).isArray();
+		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+	}
+
+	@Test
+	void indexFilterTest() throws Exception {
+		var task1 = new TaskCreateDTO();
+		task1.setAssignee_id(1L);
+		task1.setTitle("Task One is finally in the house");
+		task1.setContent("The description of the task One");
+		task1.setStatus("to_be_fixed");
+		task1.setTaskLabelIds(List.of(1L));
+
+		var task2 = new TaskCreateDTO();
+		task2.setAssignee_id(1L);
+		task2.setTitle("Task Two has already in the house");
+		task2.setContent("The description of the task Two");
+		task2.setStatus("to_be_fixed");
+		task2.setTaskLabelIds(List.of(1L));
+
+		var savedOne = service.createTask(task1);
+		var savedTwo = service.createTask(task2);
+		List<Long> ids = new ArrayList<>();
+		ids.add(savedOne.getId());
+		ids.add(savedTwo.getId());
+
+		var request = get("/api/tasks").with(token)
+				.param("titleCont", "in the house")
+				.param("assigneeId", "1")
+				.param("status", "to_be_fixed");
+				//.param("labelId", "1");
+		var response = mockMvc.perform(request)
+				.andExpect(status().isOk())
+				.andReturn();
+		var body = response.getResponse().getContentAsString();
+
+		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() {});
+		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
+		List<Task> expected = repository.findAllById(ids);
 
 		assertThatJson(body).isArray();
 		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
