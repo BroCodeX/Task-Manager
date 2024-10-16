@@ -34,3 +34,13 @@ springdoc:
     path: /swagger/api-docs
   swagger-ui:
     path: /swagger/swagger-ui.html
+
+sentry:
+  logging:
+    minimum-event-level: info
+    minimum-breadcrumb-level: debug
+  dsn: "https://24f6b4aa4ba193b8e15499a544fe6e9d@o4508133175066624.ingest.de.sentry.io/4508133200298064"
+  # Set traces_sample_rate to 1.0 to capture 100%
+  # of transactions for tracing.
+  # We recommend adjusting this value in production.
+  tracesSampleRate: 1.0

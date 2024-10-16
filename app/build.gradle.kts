@@ -11,6 +11,7 @@ plugins {
 	id("com.adarshr.test-logger") version "4.0.0"
 	id("io.freefair.lombok") version "8.4"
 	application
+	id("io.sentry.jvm.gradle") version "4.12.0"
 }
 
 group = "hexlet.code"
@@ -66,6 +67,11 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0")
 
+	// Logger
+	implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.15.0")
+	implementation("io.sentry:sentry-logback:7.15.0")
+	implementation("io.sentry:sentry-log4j2:7.15.0")
+
 	// Mapper
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
@@ -101,4 +107,15 @@ application {
 checkstyle {
 	toolVersion = "10.18.2"
 	configFile = file("config/checkstyle/checkstyle.xml")
+}
+
+sentry {
+	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+	// This enables source context, allowing you to see your source
+	// code as part of your stack traces in Sentry.
+	includeSourceContext = true
+
+	org = "brocodex"
+	projectName = "java-spring-boot"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
