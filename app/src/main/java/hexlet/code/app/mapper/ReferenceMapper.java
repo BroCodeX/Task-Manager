@@ -35,7 +35,8 @@ public class ReferenceMapper {
 
     @Named("toStatusEntity")
     public Status toStatusEntity(String slug) {
-        return statusRepository.findBySlug(slug).orElse(null);
+        return statusRepository.findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundExcepiton("Slug " + slug + " is not found"));
     }
 
     @Named("toLabelEntity")

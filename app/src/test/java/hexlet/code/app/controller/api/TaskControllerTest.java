@@ -142,8 +142,6 @@ class TaskControllerTest {
 		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
 		List<Task> expected = repository.findAllById(ids);
 
-		actual.forEach(i -> System.out.println("AACCTT " + i.getName()));
-
 		assertThatJson(body).isArray();
 		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
 	}
@@ -200,7 +198,7 @@ class TaskControllerTest {
 		assertThatJson(body).and(
 				n -> n.node("title").isEqualTo(refData.get("title")),
 				n -> n.node("content").isEqualTo(refData.get("content")),
-				n -> n.node("status").isEqualTo("Draft")
+				n -> n.node("status").isEqualTo(refData.get("status"))
 		);
 	}
 
@@ -241,7 +239,7 @@ class TaskControllerTest {
 		assertThatJson(body).and(
 				n -> n.node("title").isEqualTo(refData.get("title")),
 				n -> n.node("content").isEqualTo(refData.get("content")),
-				n -> n.node("status").isEqualTo("To Review")
+				n -> n.node("status").isEqualTo(refData.get("status"))
 		);
 		assertThat(repository.findById(id).get().getName()).isEqualTo(refData.get("title"));
 	}
