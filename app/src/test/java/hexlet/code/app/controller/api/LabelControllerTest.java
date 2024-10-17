@@ -32,7 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -102,7 +105,7 @@ public class LabelControllerTest {
                 .andReturn();
         var body = response.getResponse().getContentAsString();
 
-        List<LabelDTO> labelDTOS = objectMapper.readValue(body, new TypeReference<>() {});
+        List<LabelDTO> labelDTOS = objectMapper.readValue(body, new TypeReference<>() { });
         List<Label> actual = labelDTOS.stream().map(mapper::map).toList();
         List<Label> expected = repository.findAll();
 
@@ -132,7 +135,7 @@ public class LabelControllerTest {
 
     @Test
     void showTestFailed() throws Exception {
-        long id = label.getId();;
+        long id = label.getId();
 
         var request = get("/api/labels/{id}", id)
                 .with(tokenFailed);

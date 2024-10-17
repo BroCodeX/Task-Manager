@@ -10,7 +10,6 @@ import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.service.UserService;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import org.springframework.security.test.web.servlet
-		.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
+    .request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -33,7 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -116,7 +118,7 @@ class UserControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<UserDTO> userDTOS = objectMapper.readValue(body, new TypeReference<>() {});
+		List<UserDTO> userDTOS = objectMapper.readValue(body, new TypeReference<>() { });
 		List<User> actual = userDTOS.stream().map(userMapper::map).toList();
 		List<User> expected = userRepository.findAll();
 
