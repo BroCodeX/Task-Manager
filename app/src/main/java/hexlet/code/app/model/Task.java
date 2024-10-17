@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -37,17 +39,18 @@ public class Task implements BaseEntity {
     private String description;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", nullable = false)
     private Status taskStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignee_id")
     private User assignee;
 
     @CreatedDate
     private LocalDate createdAt;
 
-    @ManyToMany(mappedBy = "tasks")
+    @ManyToMany
+    @Fetch(FetchMode.JOIN)
     private List<Label> labels = new ArrayList<>();
 }

@@ -11,6 +11,7 @@ plugins {
 	id("com.adarshr.test-logger") version "4.0.0"
 	id("io.freefair.lombok") version "8.4"
 	application
+	id("io.sentry.jvm.gradle") version "4.12.0"
 }
 
 group = "hexlet.code"
@@ -47,7 +48,6 @@ dependencies {
 	implementation("org.apache.commons:commons-collections4:4.4")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
-	implementation("com.puppycrawl.tools:checkstyle:10.18.2")
 
 	// DB
 	implementation("org.postgresql:postgresql:42.7.3")
@@ -65,6 +65,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0")
+
+	// Logger
+	implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.15.0")
+	implementation("io.sentry:sentry-logback:7.15.0")
+	implementation("io.sentry:sentry-log4j2:7.15.0")
 
 	// Mapper
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")
@@ -96,4 +101,40 @@ tasks.jacocoTestReport {
 
 application {
 	mainClass.set("hexlet.code.app.AppApplication")
+}
+
+checkstyle {
+	toolVersion = "10.18.2"
+	configFile = file("config/checkstyle/checkstyle.xml")
+	isIgnoreFailures = false
+	isShowViolations = true
+}
+
+tasks.checkstyleMain {
+	dependsOn(tasks.compileJava)
+	outputs.upToDateWhen { false }
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+}
+
+tasks.checkstyleTest {
+	dependsOn(tasks.compileTestJava)
+	outputs.upToDateWhen { false }
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+}
+
+sentry {
+	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+	// This enables source context, allowing you to see your source
+	// code as part of your stack traces in Sentry.
+	includeSourceContext = true
+
+	org = "brocodex"
+	projectName = "java-spring-boot"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }

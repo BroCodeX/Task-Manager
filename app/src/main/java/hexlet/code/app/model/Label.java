@@ -1,6 +1,13 @@
 package hexlet.code.app.model;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Column;
+import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
@@ -10,7 +17,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -31,12 +37,4 @@ public class Label implements BaseEntity {
 
     @CreatedDate
     private LocalDate createdAt;
-
-    @ManyToMany
-    @JoinTable(
-            name = "label_task",
-            joinColumns = @JoinColumn(name = "label_id"),
-            inverseJoinColumns = @JoinColumn(name = "task_id")
-    )
-    private List<Task> tasks;
 }

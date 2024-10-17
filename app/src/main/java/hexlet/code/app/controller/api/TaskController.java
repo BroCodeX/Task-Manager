@@ -2,6 +2,7 @@ package hexlet.code.app.controller.api;
 
 import hexlet.code.app.dto.task.TaskCreateDTO;
 import hexlet.code.app.dto.task.TaskDTO;
+import hexlet.code.app.dto.task.TaskFilterDTO;
 import hexlet.code.app.dto.task.TaskUpdateDTO;
 import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.service.TaskService;
@@ -12,7 +13,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.List;
 
@@ -31,8 +42,9 @@ public class TaskController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public ResponseEntity<List<TaskDTO>> index(@RequestParam(defaultValue = "10") Integer limit) {
-        var tasks = service.getAll(limit);
+    public ResponseEntity<List<TaskDTO>> index(@ModelAttribute TaskFilterDTO filterDTO,
+                                               @RequestParam(defaultValue = "1") Integer limit) {
+        var tasks = service.getAll(filterDTO, limit);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(tasks.size()));
         return ResponseEntity.ok()

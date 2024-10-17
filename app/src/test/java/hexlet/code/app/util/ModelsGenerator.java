@@ -86,7 +86,7 @@ public class ModelsGenerator {
 
     public Model<TaskCreateDTO> makeFakeTask() {
         return Instancio.of(TaskCreateDTO.class)
-                .ignore(Select.field(TaskCreateDTO::getAssignee_id))
+                .ignore(Select.field(TaskCreateDTO::getAssigneeId))
                 .supply(Select.field(TaskCreateDTO::getTitle), () -> faker.funnyName().name())
                 .supply(Select.field(TaskCreateDTO::getContent), () -> faker.esports().game())
                 .supply(Select.field(TaskCreateDTO::getStatus), () -> "draft")
