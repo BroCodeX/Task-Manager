@@ -88,11 +88,6 @@ class UserControllerTest {
 
 	}
 
-	@AfterEach
-	void cleanRepo() {
-		userRepository.deleteAll();
-	}
-
 
 	@Test
 	void loginTest() throws Exception {
