@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: "jdbc:postgresql://dpg-crhamg2j1k6c73duf6h0-a:5432/main_db1"
-    username: "main_db1_user"
-    password: "UXCTfPkZNKnUtLznMCjwMxFfMmfjimG8"
+    url: "jdbc:postgresql://dpg-cs899ktumphs73828j80-a:5432/main_db_350u"
+    username: "main_db_350u_user"
+    password: "kcRHbolsm18YqeqDDjx4C7WKNB3uJkuU"
     driver-class-name: org.postgresql.Driver
