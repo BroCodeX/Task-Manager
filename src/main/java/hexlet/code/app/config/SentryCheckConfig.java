@@ -3,8 +3,10 @@ package hexlet.code.app.config;
 import io.sentry.Sentry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("prod")
 public class SentryCheckConfig {
 
     @Bean
