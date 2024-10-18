@@ -24,6 +24,8 @@ jobs:
           distribution: 'oracle'
       - name: Build with Gradle
         run: make build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Build and Push a JaCoCo report
         uses: paambaati/codeclimate-action@v5.0.0
         env:
