@@ -136,5 +136,7 @@ sentry {
 
 	org = "brocodex"
 	projectName = "java-spring-boot"
-	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+	authToken = "sntrys_eyJpYXQiOjE3MjkyNDc3NzMuNDAwMjA5LCJ1cmwiOiJodHRwczov" +
+			"L3NlbnRyeS5pbyIsInJlZ2lvbl91cmwiOiJodHRwczovL2RlLnNlbnRyeS5pbyIsI" +
+			"m9yZyI6ImJyb2NvZGV4In0=_gLkh+JCiNwTU/hcIPK0zZTrU8PdrCyBkcncWNQxGsHs"
 }
