@@ -26,7 +26,7 @@ public class StatusService {
                 .toList();
     }
 
-    public StatusDTO showStatus(long id) {
+    public StatusDTO getStatusById(long id) {
         var maybeStatus =  repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         return mapper.map(maybeStatus);

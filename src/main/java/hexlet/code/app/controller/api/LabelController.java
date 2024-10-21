@@ -36,7 +36,7 @@ public class LabelController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public ResponseEntity<List<LabelDTO>> index(@RequestParam(defaultValue = "10") Integer limit) {
+    public ResponseEntity<List<LabelDTO>> getAll(@RequestParam(defaultValue = "10") Integer limit) {
         var labels = service.getAll(limit);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(labels.size()));
@@ -48,8 +48,8 @@ public class LabelController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public LabelDTO show(@PathVariable Long id) {
-        return service.showLabel(id);
+    public LabelDTO getById(@PathVariable Long id) {
+        return service.getLabelById(id);
     }
 
     @PostMapping("")

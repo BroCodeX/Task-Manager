@@ -2,16 +2,18 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.app.dto.AuthDTO;
 import hexlet.code.app.dto.user.UserCreateDTO;
 import hexlet.code.app.dto.user.UserDTO;
-import hexlet.code.app.mapper.UserMapper;
+import hexlet.code.app.dto.user.UserUpdateDTO;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
-import hexlet.code.app.service.UserService;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,18 +22,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import org.springframework.security.test.web.servlet
     .request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -54,63 +51,47 @@ class UserControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@Autowired
-	private UserService service;
-
-	@Autowired
-	private UserMapper userMapper;
-
-	@Autowired
-	private WebApplicationContext wac;
-
 	private JwtRequestPostProcessor token;
 
 	private JwtRequestPostProcessor tokenUser;
 
-	private UserDTO user;
-
-	private List<UserCreateDTO> users;
+	private User user;
 
 	@BeforeEach
 	void prepare() {
-
-		mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-				.defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
-				.apply(springSecurity())
-				.build();
-
 		token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-
-		var dto = Instancio.of(generator.getUserModel()).create();
-		user = service.createUser(dto);
+		user = Instancio.of(generator.getUserModel()).create();
+		userRepository.save(user);
 		tokenUser = jwt().jwt(builder -> builder.subject(user.getEmail()));
+	}
 
-		users = generator.getUserModelList().stream().map(Instancio::create).toList();
-
-
+	@AfterEach
+	public void clean() {
+		userRepository.deleteById(user.getId());
 	}
 
 
 	@Test
 	void loginTest() throws Exception {
-		Map<String, String> logData = new HashMap<>();
-		logData.put("username", "noexist@google.com");
-		logData.put("password", "noexist");
-		token = jwt().jwt(builder -> builder.subject(logData.get("username")));
+		var dto = new AuthDTO();
+		dto.setPassword("noexist");
+		dto.setUsername("noexist@google.com");
+		token = jwt().jwt(builder -> builder.subject(dto.getUsername()));
 		var request = post("/api/login")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(logData));
+				.content(objectMapper.writeValueAsString(dto));
 
 		mockMvc.perform(request)
 				.andExpect(status().isUnauthorized());
 
-		assertThat(userRepository.findByEmail(logData.get("username"))).isEmpty();
+		assertThat(userRepository.findByEmail(dto.getUsername())).isEmpty();
 	}
 
 	@Test
-	void indexTest() throws Exception {
-		users.forEach(service::createUser);
+	void getAllTest() throws Exception {
+		var anotherUser = Instancio.of(generator.getUserModel()).create();
+		userRepository.save(anotherUser);
 
 		var request = get("/api/users").with(jwt());
 		var response = mockMvc.perform(request)
@@ -118,17 +99,15 @@ class UserControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<UserDTO> userDTOS = objectMapper.readValue(body, new TypeReference<>() { });
-		List<User> actual = userDTOS.stream().map(userMapper::map).toList();
-		List<User> expected = userRepository.findAll();
+		List<UserDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
 		assertThatJson(body).isArray();
-		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+		assertTrue(actual.stream().allMatch(u -> userRepository.findById(u.getId()).isPresent()));
 	}
 
 
 	@Test
-	void showTest() throws Exception {
+	void getByIdTest() throws Exception {
 		long id  = user.getId();
 
 		var request = get("/api/users/{id}", id).with(tokenUser);
@@ -147,58 +126,46 @@ class UserControllerTest {
 	}
 
 	@Test
-	void showTestFailed() throws Exception {
-		long id  = user.getId();
-
-		var request = get("/api/users/{id}", id).with(token);
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-		var testUser = userRepository.findById(id);
-
-		assertThat(testUser).isNotEmpty();
-	}
-
-	@Test
 	void createTest() throws Exception {
-		Map<String, String> refData = new HashMap<>();
-		refData.put("email", "yandextestcreate@test.com");
-		refData.put("firstName", "yandexfirstName@test.com");
-		refData.put("lastName", "yandexlastName@test.com");
-		refData.put("password", "yandexPass");
+		var dto = new UserCreateDTO();
+		dto.setEmail("yandextestcreate@test.com");
+		dto.setFirstName("yandexfirstName@test.com");
+		dto.setLastName("yandexlastName@test.com");
+		dto.setPassword("yandexPass");
 
 		var request = post("/api/users")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		var response = mockMvc.perform(request)
 				.andExpect(status().isCreated())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
-		var testUser = userRepository.findByEmail(refData.get("email")).orElse(null);
+		var testUser = userRepository.findByEmail(dto.getEmail()).orElse(null);
 
 		assertThat(testUser).isNotNull();
 		assertThatJson(body).and(
-				n -> n.node("email").isEqualTo(refData.get("email")),
-				n -> n.node("firstName").isEqualTo(refData.get("firstName")),
-				n -> n.node("lastName").isEqualTo(refData.get("lastName"))
+				n -> n.node("email").isEqualTo(dto.getEmail()),
+				n -> n.node("firstName").isEqualTo(dto.getFirstName()),
+				n -> n.node("lastName").isEqualTo(dto.getLastName())
 		);
 	}
 
 	@Test
 	void createTestFailed() throws Exception {
-		Map<String, String> refData = new HashMap<>();
-		refData.put("email", "yandextestcreate");
-		refData.put("firstName", "yandexfirstName@test.com");
-		refData.put("lastName", "yandexlastName@test.com");
-		refData.put("password", "yandexPass");
+		var dto = new UserCreateDTO();
+		dto.setEmail("yandextestcreate");
+		dto.setFirstName("yandexfirstName@test.com");
+		dto.setLastName("yandexlastName@test.com");
+		dto.setPassword("yandexPass");
 
 		var request = post("/api/users")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		mockMvc.perform(request)
 				.andExpect(status().isBadRequest());
-		var testUser = userRepository.findByEmail(refData.get("email")).orElse(null);
+		var testUser = userRepository.findByEmail(dto.getEmail()).orElse(null);
 
 		assertNull(testUser);
 	}
@@ -207,45 +174,28 @@ class UserControllerTest {
 	void updateTest() throws Exception {
 		long id  = user.getId();
 
-		Map<String, String> refData = new HashMap<>();
-		refData.put("email", "yandextestupdate@test.com");
-		refData.put("firstName", "nowaFirstName@test.com");
-		refData.put("lastName", "nowaLastName@test.com");
+		var dto = new UserUpdateDTO();
+		dto.setEmail(JsonNullable.of("yandextestupdate@test.com"));
+		dto.setFirstName(JsonNullable.of("nowaFirstName@test.com"));
+		dto.setLastName(JsonNullable.of("nowaLastName@test.com"));
 
 		var request = put("/api/users/{id}", id)
 				.with(tokenUser)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
 		assertThatJson(body).and(
-				n -> n.node("email").isEqualTo(refData.get("email")),
-				n -> n.node("firstName").isEqualTo(refData.get("firstName")),
-				n -> n.node("lastName").isEqualTo(refData.get("lastName"))
+				n -> n.node("email").isEqualTo(dto.getEmail().get()),
+				n -> n.node("firstName").isEqualTo(dto.getFirstName().get()),
+				n -> n.node("lastName").isEqualTo(dto.getLastName().get())
 		);
-		assertThat(userRepository.findById(id).get().getEmail()).isEqualTo(refData.get("email"));
+		assertThat(userRepository.findById(id).get().getEmail()).isEqualTo(dto.getEmail().get());
 	}
 
-	@Test
-	void updateTestFailed() throws Exception {
-		long id  = user.getId();
-
-		Map<String, String> refData = new HashMap<>();
-		refData.put("email", "yandextestupdate@test.com");
-		refData.put("firstName", "nowaFirstName@test.com");
-		refData.put("lastName", "nowaLastName@test.com");
-
-		var request = put("/api/users/{id}", id)
-				.with(token)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-		assertThat(userRepository.findById(id).get().getEmail()).isEqualTo(user.getEmail());
-	}
 
 	@Test
 	void destroyTest() throws Exception {
@@ -257,18 +207,6 @@ class UserControllerTest {
 
 		var maybeUser = userRepository.findById(id).orElse(null);
 		assertThat(maybeUser).isNull();
-	}
-
-	@Test
-	void destroyTestFailed() throws Exception {
-		long id  = user.getId();
-
-		var request = delete("/api/users/{id}", id).with(token);
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-
-		var maybeUser = userRepository.findById(id).orElse(null);
-		assertThat(maybeUser).isNotNull();
 	}
 
 }

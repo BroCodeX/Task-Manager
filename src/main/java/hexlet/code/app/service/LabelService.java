@@ -27,7 +27,7 @@ public class LabelService {
                 .toList();
     }
 
-    public LabelDTO showLabel(long id) {
+    public LabelDTO getLabelById(long id) {
         var maybeLabel = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         return mapper.map(maybeLabel);

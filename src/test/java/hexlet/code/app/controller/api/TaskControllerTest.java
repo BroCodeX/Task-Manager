@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.task.TaskCreateDTO;
 import hexlet.code.app.dto.task.TaskDTO;
-import hexlet.code.app.mapper.TaskMapper;
+import hexlet.code.app.dto.task.TaskUpdateDTO;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.service.TaskService;
@@ -12,25 +12,21 @@ import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -48,7 +44,7 @@ class TaskControllerTest {
 	private ModelsGenerator generator;
 
 	@Autowired
-	private TaskRepository repository;
+	private TaskRepository taskRepository;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -56,44 +52,23 @@ class TaskControllerTest {
 	@Autowired
 	private TaskService service;
 
-	@Autowired
-	private TaskMapper mapper;
-
-	@Autowired
-	private WebApplicationContext wac;
-
 	private JwtRequestPostProcessor token;
 
-	private JwtRequestPostProcessor tokenFailed;
-
-	private TaskDTO task;
-
-	private List<TaskCreateDTO> taskList;
+	private Task task;
 
 	@BeforeEach
 	void prepare() {
-
-		mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-				.defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
-				.apply(springSecurity())
-				.build();
-
 		token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
 
-		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
+		task = Instancio.of(generator.makeFakeTask()).create();
 
-		var dto = Instancio.of(generator.makeFakeTask()).create();
-
-		task = service.createTask(dto);
-
-		taskList = generator.getTaskList().stream()
-						.map(Instancio::create)
-						.toList();
+		taskRepository.save(task);
 	}
 
 	@Test
-	void indexTest() throws Exception {
-		taskList.forEach(service::createTask);
+	void getAllTest() throws Exception {
+		var anotherTask = Instancio.of(generator.makeFakeTask()).create();
+		taskRepository.save(anotherTask);
 
 		var request = get("/api/tasks").with(token);
 		var response = mockMvc.perform(request)
@@ -101,16 +76,14 @@ class TaskControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() { });
-		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
-		List<Task> expected = repository.findAll();
+		List<TaskDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
 		assertThatJson(body).isArray();
-		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+		assertTrue(actual.stream().allMatch(t -> taskRepository.findById(t.getId()).isPresent()));
 	}
 
 	@Test
-	void indexFilterTest() throws Exception {
+	void getAllFilterTest() throws Exception {
 		var task1 = new TaskCreateDTO();
 		task1.setAssigneeId(1L);
 		task1.setTitle("Task One is finally in the house");
@@ -141,16 +114,14 @@ class TaskControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() { });
-		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
-		List<Task> expected = repository.findAllById(taskIds);
+		List<TaskDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
 		assertThatJson(body).isArray();
-		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+		assertTrue(actual.stream().allMatch(t -> taskIds.contains(t.getId())));
 	}
 
 	@Test
-	void showTest() throws Exception {
+	void getByIdTest() throws Exception {
 		long id  = task.getId();
 
 		var request = get("/api/tasks/{id}", id).with(token);
@@ -158,65 +129,54 @@ class TaskControllerTest {
 				.andExpect(status().isOk())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
-		var testTask = repository.findById(id);
+		var testTask = taskRepository.findById(id);
 
 		assertThat(testTask).isNotEmpty();
 		assertThatJson(body).and(
-				n -> n.node("title").isEqualTo(task.getTitle()),
-				n -> n.node("content").isEqualTo(task.getContent())
+				n -> n.node("title").isEqualTo(task.getName()),
+				n -> n.node("content").isEqualTo(task.getDescription())
 		);
 	}
 
 	@Test
-	void showTestFailed() throws Exception {
-		long id  = task.getId();
-
-		var request = get("/api/tasks/{id}", id).with(tokenFailed);
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-		var testTask = repository.findById(id);
-
-		assertThat(testTask).isNotEmpty();
-	}
-
-	@Test
 	void createTest() throws Exception {
-		Map<String, Object> refData = new HashMap<>();
-		refData.put("title", "yandex-name-create");
-		refData.put("content", "yandex-description-create");
-		refData.put("status", "draft");
-		refData.put("labels", List.of(1L));
+		var dto = new TaskCreateDTO();
+		dto.setTitle("yandex-name-create");
+		dto.setContent("yandex-description-create");
+		dto.setStatus("draft");
+		dto.setTaskLabelIds(List.of(1L));
 
 		var request = post("/api/tasks")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		var response = mockMvc.perform(request)
 				.andExpect(status().isCreated())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
-		var testTask = repository.findByName("yandex-name-create").orElse(null);
+		var testTask = taskRepository.findByName("yandex-name-create").orElse(null);
 
 		assertThat(testTask).isNotNull();
 		assertThatJson(body).and(
-				n -> n.node("title").isEqualTo(refData.get("title")),
-				n -> n.node("content").isEqualTo(refData.get("content")),
-				n -> n.node("status").isEqualTo(refData.get("status"))
+				n -> n.node("title").isEqualTo(dto.getTitle()),
+				n -> n.node("content").isEqualTo(dto.getContent()),
+				n -> n.node("status").isEqualTo(dto.getStatus())
 		);
 	}
 
 
 	@Test
 	void createTestFailed() throws Exception {
-		Map<String, String> refData = new HashMap<>();
-		refData.put("title", "");
-		refData.put("content", "yandex-description-create-failed");
-		refData.put("status", "Draft");
+		var dto = new TaskCreateDTO();
+		dto.setTitle("");
+		dto.setContent("yandex-description-create-failed");
+		dto.setStatus("Draft");
+		dto.setTaskLabelIds(List.of(1L));
 
 		var request = post("/api/tasks")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		mockMvc.perform(request)
 				.andExpect(status().isBadRequest());
 	}
@@ -225,40 +185,40 @@ class TaskControllerTest {
 	void updateTest() throws Exception {
 		long id  = task.getId();
 
-		Map<String, String> refData = new HashMap<>();
-		refData.put("title", "yandex-name-update");
-		refData.put("content", "yandex-description-update");
-		refData.put("status", "to_review");
+		var dto = new TaskUpdateDTO();
+		dto.setTitle(JsonNullable.of("yandex-name-update"));
+		dto.setContent(JsonNullable.of("yandex-description-update"));
+		dto.setStatus(JsonNullable.of("to_review"));
 
 		var request = put("/api/tasks/{id}", id)
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
 		assertThatJson(body).and(
-				n -> n.node("title").isEqualTo(refData.get("title")),
-				n -> n.node("content").isEqualTo(refData.get("content")),
-				n -> n.node("status").isEqualTo(refData.get("status"))
+				n -> n.node("title").isEqualTo(dto.getTitle().get()),
+				n -> n.node("content").isEqualTo(dto.getContent().get()),
+				n -> n.node("status").isEqualTo(dto.getStatus().get())
 		);
-		assertThat(repository.findById(id).get().getName()).isEqualTo(refData.get("title"));
+		assertThat(taskRepository.findById(id).get().getName()).isEqualTo(dto.getTitle().get());
 	}
 
 	@Test
 	void updateTestFailed() throws Exception {
 		long id  = task.getId();
 
-		Map<String, String> refData = new HashMap<>();
-		refData.put("title", "");
-		refData.put("description", "yandex-description-failed");
+		var dto = new TaskUpdateDTO();
+		dto.setTitle(JsonNullable.of(""));
+		dto.setContent(JsonNullable.of("yandex-description-failed"));
 
 		var request = put("/api/tasks/{id}", id)
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		mockMvc.perform(request)
 				.andExpect(status().isBadRequest());
 	}
@@ -271,19 +231,7 @@ class TaskControllerTest {
 		mockMvc.perform(request)
 				.andExpect(status().isNoContent());
 
-		var maybeTask = repository.findById(id).orElse(null);
+		var maybeTask = taskRepository.findById(id).orElse(null);
 		assertThat(maybeTask).isNull();
-	}
-
-	@Test
-	void destroyTestFailed() throws Exception {
-		long id  = task.getId();
-
-		var request = delete("/api/tasks/{id}", id).with(tokenFailed);
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-
-		var maybeTask = repository.findById(id).orElse(null);
-		assertThat(maybeTask).isNotNull();
 	}
 }

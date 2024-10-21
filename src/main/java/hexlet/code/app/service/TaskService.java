@@ -40,7 +40,7 @@ public class TaskService {
         return filteredTasks.stream().map(mapper::map).toList();
     }
 
-    public TaskDTO showTask(long id) {
+    public TaskDTO getTaskById(long id) {
         var maybeTask =  repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         return mapper.map(maybeTask);
