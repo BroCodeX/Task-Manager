@@ -42,8 +42,8 @@ public class TaskController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public ResponseEntity<List<TaskDTO>> index(@ModelAttribute TaskFilterDTO filterDTO,
-                                               @RequestParam(defaultValue = "1") Integer limit) {
+    public ResponseEntity<List<TaskDTO>> getAll(@ModelAttribute TaskFilterDTO filterDTO,
+                                                @RequestParam(defaultValue = "1") Integer limit) {
         var tasks = service.getAll(filterDTO, limit);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(tasks.size()));
@@ -55,8 +55,8 @@ public class TaskController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public TaskDTO show(@Valid @PathVariable Long id) {
-        return service.showTask(id);
+    public TaskDTO getById(@Valid @PathVariable Long id) {
+        return service.getTaskById(id);
     }
 
     @PostMapping("")

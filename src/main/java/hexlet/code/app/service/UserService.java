@@ -32,7 +32,7 @@ public class UserService {
     }
 
 
-    public UserDTO showUser(Long id) {
+    public UserDTO getUserById(Long id) {
         var maybeUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
         return mapper.map(maybeUser);

@@ -43,22 +43,22 @@ public class ModelsGenerator {
     @PostConstruct
     public void initData() {
         userModel =  makeFakeUser();
-        userModelList = IntStream.range(0, 5)
+        userModelList = IntStream.range(0, 4)
                 .mapToObj(i -> makeFakeUser())
                 .collect(Collectors.toList());
 
         statusModel = makeFakeStatus();
-        statusModelList = IntStream.range(0, 5)
+        statusModelList = IntStream.range(0, 4)
                 .mapToObj(i -> makeFakeStatus())
                 .toList();
 
         taskModel = makeFakeTask();
-        taskList = IntStream.range(0, 5)
+        taskList = IntStream.range(0, 4)
                 .mapToObj(i -> makeFakeTask())
                 .toList();
 
         labelModel = makeFakeLabel();
-        labelList = IntStream.range(0, 5)
+        labelList = IntStream.range(0, 4)
                 .mapToObj(i -> makeFakeLabel())
                 .toList();
 

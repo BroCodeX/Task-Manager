@@ -46,7 +46,7 @@ public class UserController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<UserDTO>> index(@RequestParam(defaultValue = "10") Integer limit) {
+    public ResponseEntity<List<UserDTO>> getAll(@RequestParam(defaultValue = "10") Integer limit) {
         var users = userService.getAll(limit);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(users.size()));
@@ -59,8 +59,8 @@ public class UserController {
     @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @PostAuthorize("returnObject.email == authentication.principal.getClaim('sub')")
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO show(@PathVariable Long id) {
-        return userService.showUser(id);
+    public UserDTO getById(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 
     @PostMapping("")

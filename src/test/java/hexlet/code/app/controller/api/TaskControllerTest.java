@@ -83,7 +83,7 @@ class TaskControllerTest {
 	}
 
 	@Test
-	void indexTest() throws Exception {
+	void getAllTest() throws Exception {
 		taskList.forEach(service::createTask);
 
 		var request = get("/api/tasks").with(token);
@@ -101,7 +101,7 @@ class TaskControllerTest {
 	}
 
 	@Test
-	void indexFilterTest() throws Exception {
+	void getAllFilterTest() throws Exception {
 		var task1 = new TaskCreateDTO();
 		task1.setAssigneeId(1L);
 		task1.setTitle("Task One is finally in the house");
@@ -141,7 +141,7 @@ class TaskControllerTest {
 	}
 
 	@Test
-	void showTest() throws Exception {
+	void getByIdTest() throws Exception {
 		long id  = task.getId();
 
 		var request = get("/api/tasks/{id}", id).with(token);
@@ -159,7 +159,7 @@ class TaskControllerTest {
 	}
 
 	@Test
-	void showTestFailed() throws Exception {
+	void getByIdTestFailed() throws Exception {
 		long id  = task.getId();
 
 		var request = get("/api/tasks/{id}", id).with(tokenFailed);

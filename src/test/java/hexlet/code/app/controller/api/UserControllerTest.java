@@ -10,6 +10,7 @@ import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.service.UserService;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,11 @@ class UserControllerTest {
 		users = generator.getUserModelList().stream().map(Instancio::create).toList();
 	}
 
+	@AfterEach
+	public void clean() {
+		userRepository.deleteById(user.getId());
+	}
+
 
 	@Test
 	void loginTest() throws Exception {
@@ -98,7 +104,7 @@ class UserControllerTest {
 	}
 
 	@Test
-	void indexTest() throws Exception {
+	void getAllTest() throws Exception {
 		users.forEach(service::createUser);
 
 		var request = get("/api/users").with(jwt());
@@ -117,7 +123,7 @@ class UserControllerTest {
 
 
 	@Test
-	void showTest() throws Exception {
+	void getByIdTest() throws Exception {
 		long id  = user.getId();
 
 		var request = get("/api/users/{id}", id).with(tokenUser);
@@ -136,7 +142,7 @@ class UserControllerTest {
 	}
 
 	@Test
-	void showTestFailed() throws Exception {
+	void getByIdTestFailed() throws Exception {
 		long id  = user.getId();
 
 		var request = get("/api/users/{id}", id).with(token);
