@@ -37,7 +37,7 @@ public class StatusController {
     @GetMapping("")
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<StatusDTO>> index(@RequestParam(defaultValue = "10") Integer limit) {
+    public ResponseEntity<List<StatusDTO>> getAll(@RequestParam(defaultValue = "10") Integer limit) {
         List<StatusDTO> statusDTOS = service.getAll(limit);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(statusDTOS.size()));
@@ -49,8 +49,8 @@ public class StatusController {
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
-    public StatusDTO show(@PathVariable Long id) {
-        return service.showStatus(id);
+    public StatusDTO getById(@PathVariable Long id) {
+        return service.getStatusById(id);
     }
 
     @PostMapping("")

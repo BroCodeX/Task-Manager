@@ -82,7 +82,7 @@ class StatusControllerTest {
 	}
 
 	@Test
-	void indexTest() throws Exception {
+	void getAllTest() throws Exception {
 		//statusList.forEach(statusRepository::save);
 
 		var request = get("/api/task_statuses").with(token);
@@ -100,7 +100,7 @@ class StatusControllerTest {
 	}
 
 	@Test
-	void showTest() throws Exception {
+	void getByIdTest() throws Exception {
 		long id  = status.getId();
 
 		var request = get("/api/task_statuses/{id}", id).with(token);
@@ -119,7 +119,7 @@ class StatusControllerTest {
 	}
 
 	@Test
-	void showTestFailed() throws Exception {
+	void getByIdTestFailed() throws Exception {
 		long id  = status.getId();
 
 		var request = get("/api/task_statuses/{id}", id).with(tokenFailed);

@@ -88,7 +88,7 @@ public class LabelControllerTest {
     }
 
     @Test
-    void indexTest() throws Exception {
+    void getAllTest() throws Exception {
         labelList.forEach(labelService::createLabel);
 
         var request = get("/api/labels")
@@ -107,7 +107,7 @@ public class LabelControllerTest {
     }
 
     @Test
-    void showTest() throws Exception {
+    void getByIdTest() throws Exception {
         long id = label.getId();
 
         var request = get("/api/labels/{id}", id)
@@ -127,7 +127,7 @@ public class LabelControllerTest {
     }
 
     @Test
-    void showTestFailed() throws Exception {
+    void getByIdTestFailed() throws Exception {
         long id = label.getId();
 
         var request = get("/api/labels/{id}", id)
