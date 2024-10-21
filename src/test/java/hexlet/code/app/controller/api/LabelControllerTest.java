@@ -2,6 +2,8 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.app.dto.label.LabelCreateDTO;
+import hexlet.code.app.dto.label.LabelUpdateDTO;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.util.ModelsGenerator;
@@ -9,6 +11,7 @@ import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,9 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -106,41 +107,41 @@ public class LabelControllerTest {
 
     @Test
     void createTest() throws Exception {
-        Map<String, String> refData = new HashMap<>();
-        refData.put("name", "yandex-name-label");
+        var dto = new LabelCreateDTO();
+        dto.setName("yandex-name-label");
 
         var request = post("/api/labels")
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refData));
+                .content(objectMapper.writeValueAsString(dto));
 
         var response = mockMvc.perform(request)
                 .andExpect(status().isCreated())
                 .andReturn();
         var body = response.getResponse().getContentAsString();
 
-        var maybeLabel = repository.findByName(refData.get("name")).orElse(null);
+        var maybeLabel = repository.findByName(dto.getName()).orElse(null);
 
         assertThat(maybeLabel).isNotNull();
         assertThatJson(body).and(
-                n -> n.node(("name")).isEqualTo(refData.get(("name")))
+                n -> n.node(("name")).isEqualTo(dto.getName())
         );
     }
 
     @Test
     void createTestFailedData() throws Exception {
-        Map<String, String> refData = new HashMap<>();
-        refData.put("name", "12");
+        var dto = new LabelCreateDTO();
+        dto.setName("12");
 
         var request = post("/api/labels")
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refData));
+                .content(objectMapper.writeValueAsString(dto));
 
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest());
 
-        var maybeLabel = repository.findByName(refData.get("name")).orElse(null);
+        var maybeLabel = repository.findByName(dto.getName()).orElse(null);
 
         assertNull(maybeLabel);
     }
@@ -149,13 +150,13 @@ public class LabelControllerTest {
     void updateTest() throws Exception {
         long id = label.getId();
 
-        Map<String, String> refData = new HashMap<>();
-        refData.put("name", "yandex-name-label-update");
+        var dto = new LabelUpdateDTO();
+        dto.setName(JsonNullable.of("yandex-name-label-update"));
 
         var request = put("/api/labels/{id}", id)
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refData));
+                .content(objectMapper.writeValueAsString(dto));
 
         var response = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -163,10 +164,10 @@ public class LabelControllerTest {
 
         var body = response.getResponse().getContentAsString();
 
-        assertThat(repository.findByName(refData.get("name"))).isNotEqualTo(label.getName());
+        assertThat(repository.findByName(dto.getName().get())).isNotEqualTo(label.getName());
 
         assertThatJson(body).and(
-                n -> n.node("name").isEqualTo(refData.get("name"))
+                n -> n.node("name").isEqualTo(dto.getName())
         );
     }
 
@@ -174,19 +175,19 @@ public class LabelControllerTest {
     void updateTestFailed() throws Exception {
         long id = label.getId();
 
-        Map<String, String> refData = new HashMap<>();
-        refData.put("name", "yy");
+        var dto = new LabelUpdateDTO();
+        dto.setName(JsonNullable.of("yy"));
 
         var request = put("/api/labels/{id}", id)
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refData));
+                .content(objectMapper.writeValueAsString(dto));
 
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest());
 
         var maybeLabel = repository.findById(id).get();
-        var failedLabel = repository.findByName(refData.get("name")).orElse(null);
+        var failedLabel = repository.findByName(dto.getName().get()).orElse(null);
 
         assertThat(maybeLabel.getName()).isEqualTo(label.getName());
         assertNull(failedLabel);
