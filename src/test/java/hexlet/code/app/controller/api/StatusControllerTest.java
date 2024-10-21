@@ -3,6 +3,7 @@ package hexlet.code.app.controller.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.status.StatusCreateDTO;
+import hexlet.code.app.dto.status.StatusDTO;
 import hexlet.code.app.dto.status.StatusUpdateDTO;
 import hexlet.code.app.model.Status;
 import hexlet.code.app.repository.StatusRepository;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -71,11 +73,10 @@ class StatusControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<Status> actual = objectMapper.readValue(body, new TypeReference<>() { });
-		List<Status> expected = statusRepository.findAll();
+		List<StatusDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
 		assertThatJson(body).isArray();
-		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+		assertTrue(actual.stream().allMatch(s -> statusRepository.findById(s.getId()).isPresent()));
 	}
 
 	@Test

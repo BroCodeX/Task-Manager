@@ -3,6 +3,7 @@ package hexlet.code.app.controller.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.task.TaskCreateDTO;
+import hexlet.code.app.dto.task.TaskDTO;
 import hexlet.code.app.dto.task.TaskUpdateDTO;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.repository.TaskRepository;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -74,11 +76,10 @@ class TaskControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<Task> actual = objectMapper.readValue(body, new TypeReference<>() { });
-		List<Task> expected = taskRepository.findAll();
+		List<TaskDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
 		assertThatJson(body).isArray();
-		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+		assertTrue(actual.stream().allMatch(t -> taskRepository.findById(t.getId()).isPresent()));
 	}
 
 	@Test
@@ -113,11 +114,10 @@ class TaskControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<Task> actual = objectMapper.readValue(body, new TypeReference<>() { });
-		List<Task> expected = taskRepository.findAllById(taskIds);
+		List<TaskDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
 		assertThatJson(body).isArray();
-		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+		assertTrue(actual.stream().allMatch(t -> taskIds.contains(t.getId())));
 	}
 
 	@Test

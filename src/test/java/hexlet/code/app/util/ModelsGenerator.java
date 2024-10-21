@@ -1,9 +1,5 @@
 package hexlet.code.app.util;
 
-import hexlet.code.app.dto.label.LabelCreateDTO;
-import hexlet.code.app.dto.status.StatusCreateDTO;
-import hexlet.code.app.dto.task.TaskCreateDTO;
-import hexlet.code.app.dto.user.UserCreateDTO;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Status;
 import hexlet.code.app.model.Task;
@@ -15,14 +11,9 @@ import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.instancio.Model;
 import org.instancio.Select;
-import org.instancio.junit.Seed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Component
 @Getter

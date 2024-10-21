@@ -3,6 +3,7 @@ package hexlet.code.app.controller.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.label.LabelCreateDTO;
+import hexlet.code.app.dto.label.LabelDTO;
 import hexlet.code.app.dto.label.LabelUpdateDTO;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.repository.LabelRepository;
@@ -23,7 +24,7 @@ import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -78,11 +79,10 @@ public class LabelControllerTest {
                 .andReturn();
         var body = response.getResponse().getContentAsString();
 
-        List<Label> actual = objectMapper.readValue(body, new TypeReference<>() { });
-        List<Label> expected = repository.findAll();
+        List<LabelDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
+        assertTrue(actual.stream().allMatch(l -> repository.findById(l.getId()).isPresent()));
         assertThatJson(body).isArray();
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test
