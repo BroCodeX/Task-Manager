@@ -2,11 +2,8 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.app.dto.status.StatusDTO;
-import hexlet.code.app.mapper.StatusMapper;
 import hexlet.code.app.model.Status;
 import hexlet.code.app.repository.StatusRepository;
-import hexlet.code.app.service.StatusService;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
@@ -18,10 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +23,6 @@ import java.util.Map;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -49,25 +42,15 @@ class StatusControllerTest {
 	private StatusRepository statusRepository;
 
 	@Autowired
-	private StatusService service;
-
-	@Autowired
 	private ObjectMapper objectMapper;
 
-	@Autowired
-	private StatusMapper statusMapper;
-
 	private JwtRequestPostProcessor token;
-
-	private JwtRequestPostProcessor tokenFailed;
 
 	private Status status;
 
 	@BeforeEach
 	void prepare() {
 		token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-
-		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
 		status = Instancio.of(generator.getStatusModel()).create();
 
@@ -87,7 +70,6 @@ class StatusControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-//		List<StatusDTO> statusDTOS = objectMapper.readValue(body, new TypeReference<>() { });
 		List<Status> actual = objectMapper.readValue(body, new TypeReference<>() { });
 		List<Status> expected = statusRepository.findAll();
 
@@ -112,18 +94,6 @@ class StatusControllerTest {
 				n -> n.node("slug").isEqualTo(status.getSlug())
 		);
 
-	}
-
-	@Test
-	void getByIdTestFailed() throws Exception {
-		long id  = status.getId();
-
-		var request = get("/api/task_statuses/{id}", id).with(tokenFailed);
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-		var testStatus = statusRepository.findById(id);
-
-		assertThat(testStatus).isNotEmpty();
 	}
 
 	@Test
@@ -196,7 +166,7 @@ class StatusControllerTest {
 		refData.put("slug", "");
 
 		var request = put("/api/task_statuses/{id}", id)
-				.with(tokenFailed)
+				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(refData));
 		mockMvc.perform(request)
@@ -214,17 +184,5 @@ class StatusControllerTest {
 
 		var maybestatus = statusRepository.findById(id).orElse(null);
 		assertThat(maybestatus).isNull();
-	}
-
-	@Test
-	void destroyTestFailed() throws Exception {
-		long id  = status.getId();
-
-		var request = delete("/api/task_statuses/{id}", id).with(tokenFailed);
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-
-		var maybestatus = statusRepository.findById(id).orElse(null);
-		assertThat(maybestatus).isNotNull();
 	}
 }

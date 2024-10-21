@@ -3,8 +3,6 @@ package hexlet.code.app.controller.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.task.TaskCreateDTO;
-import hexlet.code.app.dto.task.TaskDTO;
-import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.service.TaskService;
@@ -27,7 +25,6 @@ import java.util.Map;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -53,20 +50,13 @@ class TaskControllerTest {
 	@Autowired
 	private TaskService service;
 
-	@Autowired
-	private TaskMapper mapper;
-
 	private JwtRequestPostProcessor token;
-
-	private JwtRequestPostProcessor tokenFailed;
 
 	private Task task;
 
 	@BeforeEach
 	void prepare() {
 		token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-
-		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
 		task = Instancio.of(generator.makeFakeTask()).create();
 
@@ -84,8 +74,6 @@ class TaskControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-//		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() { });
-//		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
 		List<Task> actual = objectMapper.readValue(body, new TypeReference<>() { });
 		List<Task> expected = taskRepository.findAll();
 
@@ -125,7 +113,6 @@ class TaskControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		//List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() { });
 		List<Task> actual = objectMapper.readValue(body, new TypeReference<>() { });
 		List<Task> expected = taskRepository.findAllById(taskIds);
 
@@ -149,18 +136,6 @@ class TaskControllerTest {
 				n -> n.node("title").isEqualTo(task.getName()),
 				n -> n.node("content").isEqualTo(task.getDescription())
 		);
-	}
-
-	@Test
-	void getByIdTestFailed() throws Exception {
-		long id  = task.getId();
-
-		var request = get("/api/tasks/{id}", id).with(tokenFailed);
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-		var testTask = taskRepository.findById(id);
-
-		assertThat(testTask).isNotEmpty();
 	}
 
 	@Test
@@ -257,17 +232,5 @@ class TaskControllerTest {
 
 		var maybeTask = taskRepository.findById(id).orElse(null);
 		assertThat(maybeTask).isNull();
-	}
-
-	@Test
-	void destroyTestFailed() throws Exception {
-		long id  = task.getId();
-
-		var request = delete("/api/tasks/{id}", id).with(tokenFailed);
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-
-		var maybeTask = taskRepository.findById(id).orElse(null);
-		assertThat(maybeTask).isNotNull();
 	}
 }

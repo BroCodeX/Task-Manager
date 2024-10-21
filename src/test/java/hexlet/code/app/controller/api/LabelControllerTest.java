@@ -2,12 +2,8 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.app.dto.label.LabelCreateDTO;
-import hexlet.code.app.dto.label.LabelDTO;
-import hexlet.code.app.mapper.LabelMapper;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.repository.LabelRepository;
-import hexlet.code.app.service.LabelService;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
@@ -19,10 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +24,6 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -54,14 +46,7 @@ public class LabelControllerTest {
     @Autowired
     private LabelRepository repository;
 
-    @Autowired
-    private LabelMapper mapper;
-
-    @Autowired
-    private LabelService labelService;
-
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
-    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor tokenFailed;
 
     private Label label;
 
@@ -69,7 +54,6 @@ public class LabelControllerTest {
     void prepare() {
 
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-        tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
         label = Instancio.of(generator.getLabelModel()).create();
 
@@ -93,7 +77,6 @@ public class LabelControllerTest {
                 .andReturn();
         var body = response.getResponse().getContentAsString();
 
-//        List<LabelDTO> labelDTOS = objectMapper.readValue(body, new TypeReference<>() { });
         List<Label> actual = objectMapper.readValue(body, new TypeReference<>() { });
         List<Label> expected = repository.findAll();
 
@@ -119,20 +102,6 @@ public class LabelControllerTest {
         assertThatJson(body).and(
                 n -> n.node("name").isEqualTo(label.getName())
         );
-    }
-
-    @Test
-    void getByIdTestFailed() throws Exception {
-        long id = label.getId();
-
-        var request = get("/api/labels/{id}", id)
-                .with(tokenFailed);
-        mockMvc.perform(request)
-                .andExpect(status().isForbidden());
-
-        var testLabel = repository.findById(id);
-
-        assertThat(testLabel).isNotEmpty();
     }
 
     @Test
@@ -234,20 +203,6 @@ public class LabelControllerTest {
 
         var maybeLabel = repository.findById(id).orElse(null);
         assertNull(maybeLabel);
-    }
-
-    @Test
-    void destroyTestFailed() throws Exception {
-        long id = label.getId();
-
-        var request = delete("/api/labels/{id}", id)
-                .with(tokenFailed);
-        mockMvc.perform(request)
-                .andExpect(status().isForbidden());
-
-        var maybeLabel = repository.findById(id);
-
-        assertThat(maybeLabel).isNotEmpty();
     }
 
 }

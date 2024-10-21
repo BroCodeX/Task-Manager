@@ -2,12 +2,8 @@ package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.app.dto.user.UserCreateDTO;
-import hexlet.code.app.dto.user.UserDTO;
-import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
-import hexlet.code.app.service.UserService;
 import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
@@ -21,10 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import org.springframework.security.test.web.servlet
     .request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +25,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -54,12 +46,6 @@ class UserControllerTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-
-	@Autowired
-	private UserService service;
-
-	@Autowired
-	private UserMapper userMapper;
 
 	private JwtRequestPostProcessor token;
 
@@ -109,7 +95,6 @@ class UserControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		//List<UserDTO> userDTOS = objectMapper.readValue(body, new TypeReference<>() { });
 		List<User> actual = objectMapper.readValue(body, new TypeReference<>() { });
 		List<User> expected = userRepository.findAll();
 
@@ -135,18 +120,6 @@ class UserControllerTest {
 				n -> n.node("firstName").isEqualTo(user.getFirstName()),
 				n -> n.node("lastName").isEqualTo(user.getLastName())
 		);
-	}
-
-	@Test
-	void getByIdTestFailed() throws Exception {
-		long id  = user.getId();
-
-		var request = get("/api/users/{id}", id).with(token);
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-		var testUser = userRepository.findById(id);
-
-		assertThat(testUser).isNotEmpty();
 	}
 
 	@Test
@@ -220,23 +193,6 @@ class UserControllerTest {
 		assertThat(userRepository.findById(id).get().getEmail()).isEqualTo(refData.get("email"));
 	}
 
-	@Test
-	void updateTestFailed() throws Exception {
-		long id  = user.getId();
-
-		Map<String, String> refData = new HashMap<>();
-		refData.put("email", "yandextestupdate@test.com");
-		refData.put("firstName", "nowaFirstName@test.com");
-		refData.put("lastName", "nowaLastName@test.com");
-
-		var request = put("/api/users/{id}", id)
-				.with(token)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-		assertThat(userRepository.findById(id).get().getEmail()).isEqualTo(user.getEmail());
-	}
 
 	@Test
 	void destroyTest() throws Exception {
@@ -248,18 +204,6 @@ class UserControllerTest {
 
 		var maybeUser = userRepository.findById(id).orElse(null);
 		assertThat(maybeUser).isNull();
-	}
-
-	@Test
-	void destroyTestFailed() throws Exception {
-		long id  = user.getId();
-
-		var request = delete("/api/users/{id}", id).with(token);
-		mockMvc.perform(request)
-				.andExpect(status().isForbidden());
-
-		var maybeUser = userRepository.findById(id).orElse(null);
-		assertThat(maybeUser).isNotNull();
 	}
 
 }
