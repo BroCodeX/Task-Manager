@@ -49,9 +49,6 @@ public class LabelControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private WebApplicationContext wac;
-
-    @Autowired
     private ModelsGenerator generator;
 
     @Autowired
@@ -72,10 +69,6 @@ public class LabelControllerTest {
 
     @BeforeEach
     void prepare() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
-                .apply(springSecurity())
-                .build();
 
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
         tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));

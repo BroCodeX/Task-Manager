@@ -57,9 +57,6 @@ class StatusControllerTest {
 	@Autowired
 	private StatusMapper statusMapper;
 
-	@Autowired
-	private WebApplicationContext wac;
-
 	private JwtRequestPostProcessor token;
 
 	private JwtRequestPostProcessor tokenFailed;
@@ -70,11 +67,6 @@ class StatusControllerTest {
 
 	@BeforeEach
 	void prepare() {
-		mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-				.defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
-				.apply(springSecurity())
-				.build();
-
 		token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
 
 		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));

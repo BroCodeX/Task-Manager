@@ -60,9 +60,6 @@ class UserControllerTest {
 	@Autowired
 	private UserMapper userMapper;
 
-	@Autowired
-	private WebApplicationContext wac;
-
 	private JwtRequestPostProcessor token;
 
 	private JwtRequestPostProcessor tokenUser;
@@ -73,12 +70,6 @@ class UserControllerTest {
 
 	@BeforeEach
 	void prepare() {
-
-		mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-				.defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
-				.apply(springSecurity())
-				.build();
-
 		token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
 
 		var dto = Instancio.of(generator.getUserModel()).create();
@@ -86,8 +77,6 @@ class UserControllerTest {
 		tokenUser = jwt().jwt(builder -> builder.subject(user.getEmail()));
 
 		users = generator.getUserModelList().stream().map(Instancio::create).toList();
-
-
 	}
 
 
