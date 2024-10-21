@@ -3,6 +3,7 @@ package hexlet.code.app.controller.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.task.TaskCreateDTO;
+import hexlet.code.app.dto.task.TaskUpdateDTO;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.service.TaskService;
@@ -10,6 +11,7 @@ import hexlet.code.app.util.ModelsGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,9 +20,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -140,16 +140,16 @@ class TaskControllerTest {
 
 	@Test
 	void createTest() throws Exception {
-		Map<String, Object> refData = new HashMap<>();
-		refData.put("title", "yandex-name-create");
-		refData.put("content", "yandex-description-create");
-		refData.put("status", "draft");
-		refData.put("labels", List.of(1L));
+		var dto = new TaskCreateDTO();
+		dto.setTitle("yandex-name-create");
+		dto.setContent("yandex-description-create");
+		dto.setStatus("draft");
+		dto.setTaskLabelIds(List.of(1L));
 
 		var request = post("/api/tasks")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		var response = mockMvc.perform(request)
 				.andExpect(status().isCreated())
 				.andReturn();
@@ -158,24 +158,25 @@ class TaskControllerTest {
 
 		assertThat(testTask).isNotNull();
 		assertThatJson(body).and(
-				n -> n.node("title").isEqualTo(refData.get("title")),
-				n -> n.node("content").isEqualTo(refData.get("content")),
-				n -> n.node("status").isEqualTo(refData.get("status"))
+				n -> n.node("title").isEqualTo(dto.getTitle()),
+				n -> n.node("content").isEqualTo(dto.getContent()),
+				n -> n.node("status").isEqualTo(dto.getStatus())
 		);
 	}
 
 
 	@Test
 	void createTestFailed() throws Exception {
-		Map<String, String> refData = new HashMap<>();
-		refData.put("title", "");
-		refData.put("content", "yandex-description-create-failed");
-		refData.put("status", "Draft");
+		var dto = new TaskCreateDTO();
+		dto.setTitle("");
+		dto.setContent("yandex-description-create-failed");
+		dto.setStatus("Draft");
+		dto.setTaskLabelIds(List.of(1L));
 
 		var request = post("/api/tasks")
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		mockMvc.perform(request)
 				.andExpect(status().isBadRequest());
 	}
@@ -184,40 +185,40 @@ class TaskControllerTest {
 	void updateTest() throws Exception {
 		long id  = task.getId();
 
-		Map<String, String> refData = new HashMap<>();
-		refData.put("title", "yandex-name-update");
-		refData.put("content", "yandex-description-update");
-		refData.put("status", "to_review");
+		var dto = new TaskUpdateDTO();
+		dto.setTitle(JsonNullable.of("yandex-name-update"));
+		dto.setContent(JsonNullable.of("yandex-description-update"));
+		dto.setStatus(JsonNullable.of("to_review"));
 
 		var request = put("/api/tasks/{id}", id)
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
 		assertThatJson(body).and(
-				n -> n.node("title").isEqualTo(refData.get("title")),
-				n -> n.node("content").isEqualTo(refData.get("content")),
-				n -> n.node("status").isEqualTo(refData.get("status"))
+				n -> n.node("title").isEqualTo(dto.getTitle().get()),
+				n -> n.node("content").isEqualTo(dto.getContent().get()),
+				n -> n.node("status").isEqualTo(dto.getStatus().get())
 		);
-		assertThat(taskRepository.findById(id).get().getName()).isEqualTo(refData.get("title"));
+		assertThat(taskRepository.findById(id).get().getName()).isEqualTo(dto.getTitle().get());
 	}
 
 	@Test
 	void updateTestFailed() throws Exception {
 		long id  = task.getId();
 
-		Map<String, String> refData = new HashMap<>();
-		refData.put("title", "");
-		refData.put("description", "yandex-description-failed");
+		var dto = new TaskUpdateDTO();
+		dto.setTitle(JsonNullable.of(""));
+		dto.setContent(JsonNullable.of("yandex-description-failed"));
 
 		var request = put("/api/tasks/{id}", id)
 				.with(token)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(refData));
+				.content(objectMapper.writeValueAsString(dto));
 		mockMvc.perform(request)
 				.andExpect(status().isBadRequest());
 	}
