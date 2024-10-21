@@ -65,19 +65,14 @@ class UserControllerTest {
 
 	private JwtRequestPostProcessor tokenUser;
 
-	private UserDTO user;
-
-	private List<UserCreateDTO> users;
+	private User user;
 
 	@BeforeEach
 	void prepare() {
 		token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-
-		var dto = Instancio.of(generator.getUserModel()).create();
-		user = service.createUser(dto);
+		user = Instancio.of(generator.getUserModel()).create();
+		userRepository.save(user);
 		tokenUser = jwt().jwt(builder -> builder.subject(user.getEmail()));
-
-		users = generator.getUserModelList().stream().map(Instancio::create).toList();
 	}
 
 	@AfterEach
@@ -105,7 +100,8 @@ class UserControllerTest {
 
 	@Test
 	void getAllTest() throws Exception {
-		users.forEach(service::createUser);
+		var anotherUser = Instancio.of(generator.getUserModel()).create();
+		userRepository.save(anotherUser);
 
 		var request = get("/api/users").with(jwt());
 		var response = mockMvc.perform(request)
@@ -113,8 +109,8 @@ class UserControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<UserDTO> userDTOS = objectMapper.readValue(body, new TypeReference<>() { });
-		List<User> actual = userDTOS.stream().map(userMapper::map).toList();
+		//List<UserDTO> userDTOS = objectMapper.readValue(body, new TypeReference<>() { });
+		List<User> actual = objectMapper.readValue(body, new TypeReference<>() { });
 		List<User> expected = userRepository.findAll();
 
 		assertThatJson(body).isArray();

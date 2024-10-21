@@ -18,10 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +45,7 @@ class TaskControllerTest {
 	private ModelsGenerator generator;
 
 	@Autowired
-	private TaskRepository repository;
+	private TaskRepository taskRepository;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -63,9 +60,7 @@ class TaskControllerTest {
 
 	private JwtRequestPostProcessor tokenFailed;
 
-	private TaskDTO task;
-
-	private List<TaskCreateDTO> taskList;
+	private Task task;
 
 	@BeforeEach
 	void prepare() {
@@ -73,18 +68,15 @@ class TaskControllerTest {
 
 		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
-		var dto = Instancio.of(generator.makeFakeTask()).create();
+		task = Instancio.of(generator.makeFakeTask()).create();
 
-		task = service.createTask(dto);
-
-		taskList = generator.getTaskList().stream()
-						.map(Instancio::create)
-						.toList();
+		taskRepository.save(task);
 	}
 
 	@Test
 	void getAllTest() throws Exception {
-		taskList.forEach(service::createTask);
+		var anotherTask = Instancio.of(generator.makeFakeTask()).create();
+		taskRepository.save(anotherTask);
 
 		var request = get("/api/tasks").with(token);
 		var response = mockMvc.perform(request)
@@ -92,9 +84,10 @@ class TaskControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() { });
-		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
-		List<Task> expected = repository.findAll();
+//		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() { });
+//		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
+		List<Task> actual = objectMapper.readValue(body, new TypeReference<>() { });
+		List<Task> expected = taskRepository.findAll();
 
 		assertThatJson(body).isArray();
 		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
@@ -132,9 +125,9 @@ class TaskControllerTest {
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() { });
-		List<Task> actual = taskDTOS.stream().map(mapper::map).toList();
-		List<Task> expected = repository.findAllById(taskIds);
+		//List<TaskDTO> taskDTOS = objectMapper.readValue(body, new TypeReference<>() { });
+		List<Task> actual = objectMapper.readValue(body, new TypeReference<>() { });
+		List<Task> expected = taskRepository.findAllById(taskIds);
 
 		assertThatJson(body).isArray();
 		assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
@@ -149,12 +142,12 @@ class TaskControllerTest {
 				.andExpect(status().isOk())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
-		var testTask = repository.findById(id);
+		var testTask = taskRepository.findById(id);
 
 		assertThat(testTask).isNotEmpty();
 		assertThatJson(body).and(
-				n -> n.node("title").isEqualTo(task.getTitle()),
-				n -> n.node("content").isEqualTo(task.getContent())
+				n -> n.node("title").isEqualTo(task.getName()),
+				n -> n.node("content").isEqualTo(task.getDescription())
 		);
 	}
 
@@ -165,7 +158,7 @@ class TaskControllerTest {
 		var request = get("/api/tasks/{id}", id).with(tokenFailed);
 		mockMvc.perform(request)
 				.andExpect(status().isForbidden());
-		var testTask = repository.findById(id);
+		var testTask = taskRepository.findById(id);
 
 		assertThat(testTask).isNotEmpty();
 	}
@@ -186,7 +179,7 @@ class TaskControllerTest {
 				.andExpect(status().isCreated())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
-		var testTask = repository.findByName("yandex-name-create").orElse(null);
+		var testTask = taskRepository.findByName("yandex-name-create").orElse(null);
 
 		assertThat(testTask).isNotNull();
 		assertThatJson(body).and(
@@ -235,7 +228,7 @@ class TaskControllerTest {
 				n -> n.node("content").isEqualTo(refData.get("content")),
 				n -> n.node("status").isEqualTo(refData.get("status"))
 		);
-		assertThat(repository.findById(id).get().getName()).isEqualTo(refData.get("title"));
+		assertThat(taskRepository.findById(id).get().getName()).isEqualTo(refData.get("title"));
 	}
 
 	@Test
@@ -262,7 +255,7 @@ class TaskControllerTest {
 		mockMvc.perform(request)
 				.andExpect(status().isNoContent());
 
-		var maybeTask = repository.findById(id).orElse(null);
+		var maybeTask = taskRepository.findById(id).orElse(null);
 		assertThat(maybeTask).isNull();
 	}
 
@@ -274,7 +267,7 @@ class TaskControllerTest {
 		mockMvc.perform(request)
 				.andExpect(status().isForbidden());
 
-		var maybeTask = repository.findById(id).orElse(null);
+		var maybeTask = taskRepository.findById(id).orElse(null);
 		assertThat(maybeTask).isNotNull();
 	}
 }

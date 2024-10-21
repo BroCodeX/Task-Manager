@@ -61,9 +61,7 @@ class StatusControllerTest {
 
 	private JwtRequestPostProcessor tokenFailed;
 
-	private StatusDTO status;
-
-//	private List<Status> statusList;
+	private Status status;
 
 	@BeforeEach
 	void prepare() {
@@ -71,9 +69,9 @@ class StatusControllerTest {
 
 		tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
-		var dto = Instancio.of(generator.getStatusModel()).create();
-		status = service.createStatus(dto);
-//		statusList = generator.getStatusModelList().stream().map(Instancio::create).toList();
+		status = Instancio.of(generator.getStatusModel()).create();
+
+		statusRepository.save(status);
 	}
 
 	@AfterEach
@@ -83,16 +81,14 @@ class StatusControllerTest {
 
 	@Test
 	void getAllTest() throws Exception {
-		//statusList.forEach(statusRepository::save);
-
 		var request = get("/api/task_statuses").with(token);
 		var response = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
 
-		List<StatusDTO> statusDTOS = objectMapper.readValue(body, new TypeReference<>() { });
-		List<Status> actual = statusDTOS.stream().map(statusMapper::map).toList();
+//		List<StatusDTO> statusDTOS = objectMapper.readValue(body, new TypeReference<>() { });
+		List<Status> actual = objectMapper.readValue(body, new TypeReference<>() { });
 		List<Status> expected = statusRepository.findAll();
 
 		assertThatJson(body).isArray();
@@ -108,9 +104,9 @@ class StatusControllerTest {
 				.andExpect(status().isOk())
 				.andReturn();
 		var body = response.getResponse().getContentAsString();
-		var teststatus = statusRepository.findById(id);
+		var testStatus = statusRepository.findById(id);
 
-		assertThat(teststatus).isNotEmpty();
+		assertThat(testStatus).isNotEmpty();
 		assertThatJson(body).and(
 				n -> n.node("name").isEqualTo(status.getName()),
 				n -> n.node("slug").isEqualTo(status.getSlug())
@@ -125,9 +121,9 @@ class StatusControllerTest {
 		var request = get("/api/task_statuses/{id}", id).with(tokenFailed);
 		mockMvc.perform(request)
 				.andExpect(status().isForbidden());
-		var teststatus = statusRepository.findById(id);
+		var testStatus = statusRepository.findById(id);
 
-		assertThat(teststatus).isNotEmpty();
+		assertThat(testStatus).isNotEmpty();
 	}
 
 	@Test

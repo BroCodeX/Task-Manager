@@ -63,9 +63,7 @@ public class LabelControllerTest {
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor tokenFailed;
 
-    private LabelDTO label;
-
-    private List<LabelCreateDTO> labelList;
+    private Label label;
 
     @BeforeEach
     void prepare() {
@@ -73,13 +71,9 @@ public class LabelControllerTest {
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
         tokenFailed = jwt().jwt(builder -> builder.subject("token@failed.test"));
 
-        var dto = Instancio.of(generator.getLabelModel()).create();
+        label = Instancio.of(generator.getLabelModel()).create();
 
-        label = labelService.createLabel(dto);
-
-        labelList = generator.getLabelList().stream()
-                .map(Instancio::create)
-                .toList();
+        repository.save(label);
     }
 
     @AfterEach
@@ -89,7 +83,8 @@ public class LabelControllerTest {
 
     @Test
     void getAllTest() throws Exception {
-        labelList.forEach(labelService::createLabel);
+        var anotherLabel = Instancio.of(generator.getLabelModel()).create();
+        repository.save(anotherLabel);
 
         var request = get("/api/labels")
                 .with(token);
@@ -98,8 +93,8 @@ public class LabelControllerTest {
                 .andReturn();
         var body = response.getResponse().getContentAsString();
 
-        List<LabelDTO> labelDTOS = objectMapper.readValue(body, new TypeReference<>() { });
-        List<Label> actual = labelDTOS.stream().map(mapper::map).toList();
+//        List<LabelDTO> labelDTOS = objectMapper.readValue(body, new TypeReference<>() { });
+        List<Label> actual = objectMapper.readValue(body, new TypeReference<>() { });
         List<Label> expected = repository.findAll();
 
         assertThatJson(body).isArray();
@@ -112,11 +107,11 @@ public class LabelControllerTest {
 
         var request = get("/api/labels/{id}", id)
                 .with(token);
-        var responce = mockMvc.perform(request)
+        var response = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
 
-        var body = responce.getResponse().getContentAsString();
+        var body = response.getResponse().getContentAsString();
 
         var testLabel = repository.findById(id);
 
