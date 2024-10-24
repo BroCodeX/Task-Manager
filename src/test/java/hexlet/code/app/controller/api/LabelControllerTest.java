@@ -101,7 +101,9 @@ public class LabelControllerTest {
 
         assertThat(testLabel).isNotEmpty();
         assertThatJson(body).and(
-                n -> n.node("name").isEqualTo(label.getName())
+                n -> n.node("name").isEqualTo(label.getName()),
+                n -> n.node("id").isEqualTo(id)
+
         );
     }
 
@@ -129,7 +131,7 @@ public class LabelControllerTest {
     }
 
     @Test
-    void createTestFailedData() throws Exception {
+    void createTestBadRequest() throws Exception {
         var dto = new LabelCreateDTO();
         dto.setName("12");
 
@@ -172,7 +174,7 @@ public class LabelControllerTest {
     }
 
     @Test
-    void updateTestFailed() throws Exception {
+    void updateTestBadRequest() throws Exception {
         long id = label.getId();
 
         var dto = new LabelUpdateDTO();

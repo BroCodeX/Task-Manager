@@ -121,7 +121,8 @@ class UserControllerTest {
 		assertThatJson(body).and(
 				n -> n.node("email").isEqualTo(user.getEmail()),
 				n -> n.node("firstName").isEqualTo(user.getFirstName()),
-				n -> n.node("lastName").isEqualTo(user.getLastName())
+				n -> n.node("lastName").isEqualTo(user.getLastName()),
+				n -> n.node("id").isEqualTo(id)
 		);
 	}
 
@@ -152,7 +153,7 @@ class UserControllerTest {
 	}
 
 	@Test
-	void createTestFailed() throws Exception {
+	void createTestBadRequest() throws Exception {
 		var dto = new UserCreateDTO();
 		dto.setEmail("yandextestcreate");
 		dto.setFirstName("yandexfirstName@test.com");

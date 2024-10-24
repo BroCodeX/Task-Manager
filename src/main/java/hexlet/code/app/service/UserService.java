@@ -2,7 +2,6 @@ package hexlet.code.app.service;
 
 import hexlet.code.app.dto.user.UserCreateDTO;
 import hexlet.code.app.dto.user.UserUpdateDTO;
-import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import hexlet.code.app.dto.user.UserDTO;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class UserService {
@@ -34,7 +34,7 @@ public class UserService {
 
     public UserDTO getUserById(Long id) {
         var maybeUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
+                .orElseThrow(NoSuchElementException::new);
         return mapper.map(maybeUser);
     }
 
@@ -50,7 +50,7 @@ public class UserService {
 
     public UserDTO updateUser(UserUpdateDTO dto, long id) {
         var maybeUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
+                .orElseThrow(NoSuchElementException::new);
         if (dto.getPassword() != null && dto.getPassword().isPresent()) {
             var hashedPass = passwordEncoder.encode(dto.getPassword().get());
             dto.setPassword(JsonNullable.of(hashedPass));

@@ -93,7 +93,8 @@ class StatusControllerTest {
 		assertThat(testStatus).isNotEmpty();
 		assertThatJson(body).and(
 				n -> n.node("name").isEqualTo(status.getName()),
-				n -> n.node("slug").isEqualTo(status.getSlug())
+				n -> n.node("slug").isEqualTo(status.getSlug()),
+				n -> n.node("id").isEqualTo(id)
 		);
 
 	}
@@ -122,7 +123,7 @@ class StatusControllerTest {
 	}
 
 	@Test
-	void createTestFailed() throws Exception {
+	void createTestBadRequest() throws Exception {
 		var dto = new StatusCreateDTO();
 		dto.setName("");
 		dto.setSlug("");
@@ -160,7 +161,7 @@ class StatusControllerTest {
 	}
 
 	@Test
-	void updateTestFailed() throws Exception {
+	void updateTestBadRequest() throws Exception {
 		long id  = status.getId();
 
 		var dto = new StatusUpdateDTO();

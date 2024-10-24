@@ -3,13 +3,13 @@ package hexlet.code.app.service;
 import hexlet.code.app.dto.status.StatusCreateDTO;
 import hexlet.code.app.dto.status.StatusDTO;
 import hexlet.code.app.dto.status.StatusUpdateDTO;
-import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.mapper.StatusMapper;
 import hexlet.code.app.repository.StatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class StatusService {
@@ -28,7 +28,7 @@ public class StatusService {
 
     public StatusDTO getStatusById(long id) {
         var maybeStatus =  repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
+                .orElseThrow(NoSuchElementException::new);
         return mapper.map(maybeStatus);
     }
 
@@ -40,7 +40,7 @@ public class StatusService {
 
     public StatusDTO updateStatus(StatusUpdateDTO dto, long id) {
         var maybeStatus =  repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
+                .orElseThrow(NoSuchElementException::new);
         mapper.update(dto, maybeStatus);
         repository.save(maybeStatus);
         return mapper.map(maybeStatus);

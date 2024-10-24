@@ -1,11 +1,12 @@
 package hexlet.code.app.util;
 
-import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import java.util.NoSuchElementException;
 
 @Component
 public class UserUtils {
@@ -23,7 +24,7 @@ public class UserUtils {
 
     public boolean isOwner(Long id, String email) {
         var maybeUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id " + id + " not found"));
+                .orElseThrow(NoSuchElementException::new);
         return maybeUser.getEmail().equals(email);
     }
 
