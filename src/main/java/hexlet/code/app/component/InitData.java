@@ -6,6 +6,7 @@ import hexlet.code.app.dto.user.UserCreateDTO;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Status;
+import hexlet.code.app.model.User;
 import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.StatusRepository;
 import hexlet.code.app.repository.UserRepository;
@@ -56,10 +57,13 @@ public class InitData implements ApplicationRunner {
     }
 
     private void initUser() {
-        UserCreateDTO dto = new UserCreateDTO();
-        dto.setEmail("hexlet@example.com");
-        dto.setPassword("qwerty");
-        userService.createUser(dto);
+        User user = new User();
+        user.setEmail("hexlet@example.com");
+        user.setPassword("qwerty");
+        var isUserPresent = userRepository.findByEmail(user.getEmail()).isEmpty();
+        if(isUserPresent) {
+            userRepository.save(user);
+        }
         var hexletUser = userRepository.findByEmail("hexlet@example.com").get();
         System.out.println("Init user: " + hexletUser + " created");
     }
@@ -67,15 +71,19 @@ public class InitData implements ApplicationRunner {
     private void initStatuses() {
         List<String> slugs = List.of("draft", "to_review", "to_be_fixed", "to_publish", "published");
         List<String> titles = List.of("Draft", "To Review", "To Be Fixed", "To Publish", "Published");
-        List<StatusCreateDTO> statusListDTOS = IntStream.range(0, titles.size())
+        List<Status> statusList = IntStream.range(0, titles.size())
                         .mapToObj(i -> {
-                            var dto = new StatusCreateDTO();
-                            dto.setName(titles.get(i));
-                            dto.setSlug(slugs.get(i));
-                            return dto;
+                            var item = new Status();
+                            item.setName(titles.get(i));
+                            item.setSlug(slugs.get(i));
+                            return item;
                         }).toList();
 
-        statusListDTOS.forEach(statusService::createStatus);
+        statusList.forEach(s -> {
+            if (statusRepository.findBySlug(s.getSlug()).isEmpty()) {
+                statusRepository.save(s);
+            }
+        });
         List<String> checkTitles = statusRepository.findAll().stream()
                 .map(Status::getName)
                 .toList();
@@ -84,13 +92,16 @@ public class InitData implements ApplicationRunner {
 
     private void initLabels() {
         List<String> labels = List.of("feature", "bug");
-        List<LabelCreateDTO> labelCreateDTOS = IntStream.range(0, labels.size())
-                .mapToObj(i -> {
-                    var dto = new LabelCreateDTO();
-                    dto.setName(labels.get(i));
-                    return dto;
-                }).toList();
-        labelCreateDTOS.forEach(labelService::createLabel);
+        List<Label> labelList = labels.stream().map(label -> {
+            var item = new Label();
+            item.setName(label);
+            return item;
+        }).toList();
+        labelList.forEach(l -> {
+            if (labelRepository.findByName(l.getName()).isEmpty()) {
+                labelRepository.save(l);
+            }
+        });
         var checkLables = labelRepository.findAll().stream()
                 .map(Label::getName)
                 .toList();
