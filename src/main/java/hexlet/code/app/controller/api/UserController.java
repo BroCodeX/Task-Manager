@@ -46,8 +46,8 @@ public class UserController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<UserDTO>> getAll(@RequestParam(defaultValue = "10") Integer limit) {
-        var users = userService.getAll(limit);
+    public ResponseEntity<List<UserDTO>> getAll() {
+        var users = userService.getAll();
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(users.size()));
         return ResponseEntity.ok()

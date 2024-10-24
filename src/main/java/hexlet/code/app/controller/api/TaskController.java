@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,9 +41,8 @@ public class TaskController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
-    public ResponseEntity<List<TaskDTO>> getAll(@ModelAttribute TaskFilterDTO filterDTO,
-                                                @RequestParam(defaultValue = "1") Integer limit) {
-        var tasks = service.getAll(filterDTO, limit);
+    public ResponseEntity<List<TaskDTO>> getAll(@ModelAttribute TaskFilterDTO filterDTO) {
+        var tasks = service.getAll(filterDTO);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(tasks.size()));
         return ResponseEntity.ok()

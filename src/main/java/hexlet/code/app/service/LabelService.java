@@ -20,9 +20,8 @@ public class LabelService {
     @Autowired
     private LabelRepository repository;
 
-    public List<LabelDTO> getAll(int limit) {
+    public List<LabelDTO> getAll() {
         return repository.findAll().stream()
-                .limit(limit)
                 .map(mapper::map)
                 .toList();
     }

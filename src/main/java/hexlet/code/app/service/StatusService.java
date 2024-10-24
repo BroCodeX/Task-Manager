@@ -19,9 +19,8 @@ public class StatusService {
     @Autowired
     private StatusMapper mapper;
 
-    public List<StatusDTO> getAll(int limit) {
+    public List<StatusDTO> getAll() {
         return repository.findAll().stream()
-                .limit(limit)
                 .map(mapper::map)
                 .toList();
     }

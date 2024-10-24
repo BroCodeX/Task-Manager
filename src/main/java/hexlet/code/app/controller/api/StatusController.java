@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,8 +36,8 @@ public class StatusController {
     @GetMapping("")
     @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<StatusDTO>> getAll(@RequestParam(defaultValue = "10") Integer limit) {
-        List<StatusDTO> statusDTOS = service.getAll(limit);
+    public ResponseEntity<List<StatusDTO>> getAll() {
+        List<StatusDTO> statusDTOS = service.getAll();
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(statusDTOS.size()));
         return ResponseEntity.ok()

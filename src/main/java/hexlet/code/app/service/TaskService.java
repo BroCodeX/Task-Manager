@@ -6,11 +6,8 @@ import hexlet.code.app.dto.task.TaskDTO;
 import hexlet.code.app.dto.task.TaskFilterDTO;
 import hexlet.code.app.dto.task.TaskUpdateDTO;
 import hexlet.code.app.mapper.TaskMapper;
-import hexlet.code.app.model.Task;
 import hexlet.code.app.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,16 +24,9 @@ public class TaskService {
     @Autowired
     private TaskSpecification specification;
 
-    public List<TaskDTO> getAll(int limit) {
-        return repository.findAll().stream()
-                .map(mapper::map)
-                .limit(limit)
-                .toList();
-    }
-
-    public List<TaskDTO> getAll(TaskFilterDTO filterDTO, int limit) {
+    public List<TaskDTO> getAll(TaskFilterDTO filterDTO) {
         var spec = specification.build(filterDTO);
-        Page<Task> filteredTasks = repository.findAll(spec, PageRequest.of(limit - 1, 10));
+        var filteredTasks = repository.findAll(spec);
         return filteredTasks.stream().map(mapper::map).toList();
     }
 

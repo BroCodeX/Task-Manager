@@ -24,9 +24,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public List<UserDTO> getAll(int limit) {
+    public List<UserDTO> getAll() {
         return userRepository.findAll().stream()
-                .limit(limit)
                 .map(mapper::map)
                 .toList();
     }
