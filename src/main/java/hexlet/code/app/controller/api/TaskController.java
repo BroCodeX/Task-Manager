@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -51,7 +50,6 @@ public class TaskController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public TaskDTO getById(@Valid @PathVariable Long id) {
         return service.getTaskById(id);
     }
@@ -64,14 +62,12 @@ public class TaskController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public TaskDTO update(@Valid @RequestBody TaskUpdateDTO dto, @PathVariable Long id) {
         return service.updateTask(dto, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public void destroy(@PathVariable Long id) {
         service.destroyTask(id);
     }

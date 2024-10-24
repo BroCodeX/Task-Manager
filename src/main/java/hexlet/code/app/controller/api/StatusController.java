@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -45,7 +44,6 @@ public class StatusController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public StatusDTO getById(@PathVariable Long id) {
         return service.getStatusById(id);
@@ -58,14 +56,12 @@ public class StatusController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public StatusDTO update(@Valid @RequestBody StatusUpdateDTO dto, @PathVariable Long id) {
         return service.updateStatus(dto, id);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable Long id) {
         service.destroyStatus(id);

@@ -5,13 +5,8 @@ import hexlet.code.app.dto.user.UserDTO;
 import hexlet.code.app.dto.user.UserUpdateDTO;
 import hexlet.code.app.model.User;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -31,17 +26,23 @@ public abstract class UserMapper {
 
     public abstract UserDTO map(User user);
 
-    @Mapping(source = "password", target = "password", qualifiedByName = "toHashPass")
     public abstract User map(UserCreateDTO dto);
 
-    @Mapping(source = "password", target = "password", qualifiedByName = "toHashPass")
     public abstract void update(UserUpdateDTO dto, @MappingTarget User user);
 
-    @Named("toHashPass")
-    public String toHashPass(String pass) {
-        if(pass != null && !pass.isBlank()) {
-            return passwordEncoder.encode(pass);
+    @BeforeMapping // Marks a method to be invoked at the beginning of a generated mapping method.
+    public void toHashPass(UserCreateDTO dto) {
+        if(dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            var encodedPass = passwordEncoder.encode(dto.getPassword());
+            dto.setPassword(encodedPass);
         }
-        return pass;
+    }
+
+    @BeforeMapping
+    public void toHashPass(UserUpdateDTO dto) {
+        if(dto.getPassword() != null && dto.getPassword().isPresent()) {
+            var encodedPass = passwordEncoder.encode(dto.getPassword().get());
+            dto.setPassword(JsonNullable.of(encodedPass));
+        }
     }
 }

@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -45,7 +44,6 @@ public class LabelController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public LabelDTO getById(@PathVariable Long id) {
         return service.getLabelById(id);
     }
@@ -58,14 +56,12 @@ public class LabelController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public LabelDTO update(@Valid @RequestBody LabelUpdateDTO dto, @PathVariable Long id) {
         return service.updateLabel(dto, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public void destroy(@PathVariable long id) {
         service.destroyLabel(id);
     }
