@@ -3,13 +3,13 @@ package hexlet.code.app.service;
 import hexlet.code.app.dto.label.LabelCreateDTO;
 import hexlet.code.app.dto.label.LabelDTO;
 import hexlet.code.app.dto.label.LabelUpdateDTO;
-import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.mapper.LabelMapper;
 import hexlet.code.app.repository.LabelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class LabelService {
@@ -20,16 +20,15 @@ public class LabelService {
     @Autowired
     private LabelRepository repository;
 
-    public List<LabelDTO> getAll(int limit) {
+    public List<LabelDTO> getAll() {
         return repository.findAll().stream()
-                .limit(limit)
                 .map(mapper::map)
                 .toList();
     }
 
     public LabelDTO getLabelById(long id) {
         var maybeLabel = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
+                .orElseThrow(NoSuchElementException::new);
         return mapper.map(maybeLabel);
     }
 
@@ -41,7 +40,7 @@ public class LabelService {
 
     public LabelDTO updateLabel(LabelUpdateDTO dto, long id) {
         var maybeLabel = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
+                .orElseThrow(NoSuchElementException::new);
         mapper.update(dto, maybeLabel);
         repository.save(maybeLabel);
         return mapper.map(maybeLabel);

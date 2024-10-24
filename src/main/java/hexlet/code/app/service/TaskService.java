@@ -1,20 +1,17 @@
 package hexlet.code.app.service;
 
-import hexlet.code.app.component.TaskSpecification;
+import hexlet.code.app.util.specification.TaskSpecification;
 import hexlet.code.app.dto.task.TaskCreateDTO;
 import hexlet.code.app.dto.task.TaskDTO;
 import hexlet.code.app.dto.task.TaskFilterDTO;
 import hexlet.code.app.dto.task.TaskUpdateDTO;
-import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.mapper.TaskMapper;
-import hexlet.code.app.model.Task;
 import hexlet.code.app.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class TaskService {
@@ -27,22 +24,15 @@ public class TaskService {
     @Autowired
     private TaskSpecification specification;
 
-    public List<TaskDTO> getAll(int limit) {
-        return repository.findAll().stream()
-                .map(mapper::map)
-                .limit(limit)
-                .toList();
-    }
-
-    public List<TaskDTO> getAll(TaskFilterDTO filterDTO, int limit) {
+    public List<TaskDTO> getAll(TaskFilterDTO filterDTO) {
         var spec = specification.build(filterDTO);
-        Page<Task> filteredTasks = repository.findAll(spec, PageRequest.of(limit - 1, 10));
+        var filteredTasks = repository.findAll(spec);
         return filteredTasks.stream().map(mapper::map).toList();
     }
 
     public TaskDTO getTaskById(long id) {
         var maybeTask =  repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
+                .orElseThrow(NoSuchElementException::new);
         return mapper.map(maybeTask);
     }
 
@@ -54,7 +44,7 @@ public class TaskService {
 
     public TaskDTO updateTask(TaskUpdateDTO dto, long id) {
         var maybeTask =  repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("This id: " + id + " is not found"));
+                .orElseThrow(NoSuchElementException::new);
         mapper.update(dto, maybeTask);
         repository.save(maybeTask);
         return mapper.map(maybeTask);

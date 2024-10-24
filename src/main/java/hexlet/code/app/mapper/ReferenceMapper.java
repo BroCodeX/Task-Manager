@@ -1,6 +1,5 @@
 package hexlet.code.app.mapper;
 
-import hexlet.code.app.exception.ResourceNotFoundExcepiton;
 import hexlet.code.app.model.BaseEntity;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Status;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING
@@ -36,13 +36,13 @@ public class ReferenceMapper {
     @Named("toStatusEntity")
     public Status toStatusEntity(String slug) {
         return statusRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("Slug " + slug + " is not found"));
+                .orElseThrow(() -> new NoSuchElementException("Slug " + slug + " is not found"));
     }
 
     @Named("toLabelEntity")
     public Label toLabelEntity(Long labelID) {
         return labelRepository.findById(labelID)
-                .orElseThrow(() -> new ResourceNotFoundExcepiton("Label with id " + labelID + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("Label with id " + labelID + " not found"));
     }
 
     @Named("toLabelEntities")

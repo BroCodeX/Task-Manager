@@ -55,7 +55,7 @@ public class InitData implements ApplicationRunner {
         initLabels();
     }
 
-    public void initUser() {
+    private void initUser() {
         UserCreateDTO dto = new UserCreateDTO();
         dto.setEmail("hexlet@example.com");
         dto.setPassword("qwerty");
@@ -64,7 +64,7 @@ public class InitData implements ApplicationRunner {
         System.out.println("Init user: " + hexletUser + " created");
     }
 
-    public void initStatuses() {
+    private void initStatuses() {
         List<String> slugs = List.of("draft", "to_review", "to_be_fixed", "to_publish", "published");
         List<String> titles = List.of("Draft", "To Review", "To Be Fixed", "To Publish", "Published");
         List<StatusCreateDTO> statusListDTOS = IntStream.range(0, titles.size())
@@ -82,7 +82,7 @@ public class InitData implements ApplicationRunner {
         System.out.println("Init statuses: " + checkTitles + " created");
     }
 
-    public void initLabels() {
+    private void initLabels() {
         List<String> labels = List.of("feature", "bug");
         List<LabelCreateDTO> labelCreateDTOS = IntStream.range(0, labels.size())
                 .mapToObj(i -> {

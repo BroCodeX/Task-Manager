@@ -134,7 +134,8 @@ class TaskControllerTest {
 		assertThat(testTask).isNotEmpty();
 		assertThatJson(body).and(
 				n -> n.node("title").isEqualTo(task.getName()),
-				n -> n.node("content").isEqualTo(task.getDescription())
+				n -> n.node("content").isEqualTo(task.getDescription()),
+				n -> n.node("id").isEqualTo(id)
 		);
 	}
 
@@ -166,7 +167,7 @@ class TaskControllerTest {
 
 
 	@Test
-	void createTestFailed() throws Exception {
+	void createTestBadRequest() throws Exception {
 		var dto = new TaskCreateDTO();
 		dto.setTitle("");
 		dto.setContent("yandex-description-create-failed");
@@ -208,7 +209,7 @@ class TaskControllerTest {
 	}
 
 	@Test
-	void updateTestFailed() throws Exception {
+	void updateTestBadRequest() throws Exception {
 		long id  = task.getId();
 
 		var dto = new TaskUpdateDTO();
