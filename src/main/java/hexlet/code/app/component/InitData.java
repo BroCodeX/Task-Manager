@@ -1,8 +1,5 @@
 package hexlet.code.app.component;
 
-import hexlet.code.app.dto.label.LabelCreateDTO;
-import hexlet.code.app.dto.status.StatusCreateDTO;
-import hexlet.code.app.dto.user.UserCreateDTO;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Status;

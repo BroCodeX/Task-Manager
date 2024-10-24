@@ -53,7 +53,6 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("@userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO getById(@PathVariable Long id) {
         return userService.getUserById(id);
