@@ -50,8 +50,8 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 
 	// DB
+	implementation("org.postgresql:postgresql:42.7.3")
 	runtimeOnly("com.h2database:h2")
-	runtimeOnly("org.postgresql:postgresql")
 
 	// Spring
 	implementation("org.springframework.boot:spring-boot-starter")
