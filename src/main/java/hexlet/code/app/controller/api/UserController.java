@@ -45,7 +45,6 @@ public class UserController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserDTO>> getAll() {
         var users = userService.getAll();
         HttpHeaders headers = new HttpHeaders();
@@ -56,29 +55,27 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
-    @PostAuthorize("returnObject.email == authentication.principal.getClaim('sub')")
+    @PreAuthorize("@userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO getById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
     @PostMapping("")
-    @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO dto) {
         return userService.createUser(dto);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@Valid @RequestBody UserUpdateDTO dto, @PathVariable Long id) {
         return userService.updateUser(dto, id);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and @userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isOwner(#id, authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable long id) {
         userService.destroyUser(id);

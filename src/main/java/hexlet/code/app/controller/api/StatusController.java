@@ -34,7 +34,6 @@ public class StatusController {
     private UserUtils userUtils;
 
     @GetMapping("")
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<StatusDTO>> getAll() {
         List<StatusDTO> statusDTOS = service.getAll();
@@ -46,28 +45,27 @@ public class StatusController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public StatusDTO getById(@PathVariable Long id) {
         return service.getStatusById(id);
     }
 
     @PostMapping("")
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.CREATED)
     public StatusDTO create(@Valid @RequestBody StatusCreateDTO dto) {
         return service.createStatus(dto);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.OK)
     public StatusDTO update(@Valid @RequestBody StatusUpdateDTO dto, @PathVariable Long id) {
         return service.updateStatus(dto, id);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable Long id) {
         service.destroyStatus(id);

@@ -34,7 +34,6 @@ public class LabelController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     public ResponseEntity<List<LabelDTO>> getAll() {
         var labels = service.getAll();
         HttpHeaders headers = new HttpHeaders();
@@ -46,28 +45,27 @@ public class LabelController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public LabelDTO getById(@PathVariable Long id) {
         return service.getLabelById(id);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     public LabelDTO create(@Valid @RequestBody LabelCreateDTO dto) {
         return service.createLabel(dto);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public LabelDTO update(@Valid @RequestBody LabelUpdateDTO dto, @PathVariable Long id) {
         return service.updateLabel(dto, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public void destroy(@PathVariable long id) {
         service.destroyLabel(id);
     }

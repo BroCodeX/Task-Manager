@@ -40,7 +40,6 @@ public class TaskController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     public ResponseEntity<List<TaskDTO>> getAll(@ModelAttribute TaskFilterDTO filterDTO) {
         var tasks = service.getAll(filterDTO);
         HttpHeaders headers = new HttpHeaders();
@@ -52,28 +51,27 @@ public class TaskController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public TaskDTO getById(@Valid @PathVariable Long id) {
         return service.getTaskById(id);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
     public TaskDTO create(@Valid @RequestBody TaskCreateDTO dto) {
         return service.createTask(dto);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public TaskDTO update(@Valid @RequestBody TaskUpdateDTO dto, @PathVariable Long id) {
         return service.updateTask(dto, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("isAuthenticated() and @userUtils.isExists(authentication.principal.getClaim('sub'))")
+    @PreAuthorize("@userUtils.isExists(authentication.principal.getClaim('sub'))")
     public void destroy(@PathVariable Long id) {
         service.destroyTask(id);
     }
