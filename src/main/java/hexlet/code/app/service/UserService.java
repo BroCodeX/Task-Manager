@@ -40,9 +40,7 @@ public class UserService {
 
 
     public UserDTO createUser(UserCreateDTO dto) {
-        var hashedPass = passwordEncoder.encode(dto.getPassword());
         var user = mapper.map(dto);
-        user.setPassword(hashedPass);
         userRepository.save(user);
         return mapper.map(user);
     }
@@ -51,10 +49,6 @@ public class UserService {
     public UserDTO updateUser(UserUpdateDTO dto, long id) {
         var maybeUser = userRepository.findById(id)
                 .orElseThrow(NoSuchElementException::new);
-        if (dto.getPassword() != null && dto.getPassword().isPresent()) {
-            var hashedPass = passwordEncoder.encode(dto.getPassword().get());
-            dto.setPassword(JsonNullable.of(hashedPass));
-        }
         mapper.update(dto, maybeUser);
         userRepository.save(maybeUser);
         return mapper.map(maybeUser);
