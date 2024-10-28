@@ -1,4 +1,4 @@
-package hexlet.code.util.specification;
+package hexlet.code.specification;
 
 import hexlet.code.dto.task.TaskFilterDTO;
 import hexlet.code.model.Task;

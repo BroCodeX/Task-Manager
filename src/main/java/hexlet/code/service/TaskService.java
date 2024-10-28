@@ -1,6 +1,6 @@
 package hexlet.code.service;
 
-import hexlet.code.util.specification.TaskSpecification;
+import hexlet.code.specification.TaskSpecification;
 import hexlet.code.dto.task.TaskCreateDTO;
 import hexlet.code.dto.task.TaskDTO;
 import hexlet.code.dto.task.TaskFilterDTO;
