@@ -37,7 +37,7 @@ public class TaskController {
     @Autowired
     private TaskMapper mapper;
 
-    @GetMapping("")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<TaskDTO>> getAll(@ModelAttribute TaskFilterDTO filterDTO) {
         var tasks = service.getAll(filterDTO);
@@ -54,7 +54,7 @@ public class TaskController {
         return service.getTaskById(id);
     }
 
-    @PostMapping("")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TaskDTO create(@Valid @RequestBody TaskCreateDTO dto) {
         return service.createTask(dto);

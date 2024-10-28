@@ -41,7 +41,7 @@ public class UserController {
     @Autowired
     private UserUtils userUtils;
 
-    @GetMapping("")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<UserDTO>> getAll() {
         var users = userService.getAll();
@@ -58,7 +58,7 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @PostMapping("")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO dto) {
         return userService.createUser(dto);

@@ -31,7 +31,7 @@ public class LabelController {
     @Autowired
     private UserUtils userUtils;
 
-    @GetMapping("")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<LabelDTO>> getAll() {
         var labels = service.getAll();
@@ -48,7 +48,7 @@ public class LabelController {
         return service.getLabelById(id);
     }
 
-    @PostMapping("")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public LabelDTO create(@Valid @RequestBody LabelCreateDTO dto) {
         return service.createLabel(dto);

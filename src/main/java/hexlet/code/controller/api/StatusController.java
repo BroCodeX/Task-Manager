@@ -32,7 +32,7 @@ public class StatusController {
     @Autowired
     private UserUtils userUtils;
 
-    @GetMapping("")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<StatusDTO>> getAll() {
         List<StatusDTO> statusDTOS = service.getAll();
@@ -49,7 +49,7 @@ public class StatusController {
         return service.getStatusById(id);
     }
 
-    @PostMapping("")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public StatusDTO create(@Valid @RequestBody StatusCreateDTO dto) {
         return service.createStatus(dto);
