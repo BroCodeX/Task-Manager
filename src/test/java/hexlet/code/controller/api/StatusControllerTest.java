@@ -76,7 +76,7 @@ class StatusControllerTest {
 		List<StatusDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
 		assertThatJson(body).isArray();
-		assertTrue(actual.stream().allMatch(s -> statusRepository.findById(s.getId()).isPresent()));
+		assertThat(actual.stream().allMatch(s -> statusRepository.findById(s.getId()).isPresent())).isTrue();
 	}
 
 	@Test

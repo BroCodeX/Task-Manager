@@ -24,8 +24,6 @@ import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -81,8 +79,7 @@ public class LabelControllerTest {
         var body = response.getResponse().getContentAsString();
 
         List<LabelDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
-
-        assertTrue(actual.stream().allMatch(l -> repository.findById(l.getId()).isPresent()));
+        assertThat(actual.stream().allMatch(l -> repository.findById(l.getId()).isPresent())).isTrue();
         assertThatJson(body).isArray();
     }
 
@@ -146,7 +143,7 @@ public class LabelControllerTest {
 
         var maybeLabel = repository.findByName(dto.getName()).orElse(null);
 
-        assertNull(maybeLabel);
+        assertThat(maybeLabel).isNull();
     }
 
     @Test
@@ -193,7 +190,7 @@ public class LabelControllerTest {
         var failedLabel = repository.findByName(dto.getName().get()).orElse(null);
 
         assertThat(maybeLabel.getName()).isEqualTo(label.getName());
-        assertNull(failedLabel);
+        assertThat(failedLabel).isNull();
     }
 
     @Test
@@ -206,7 +203,7 @@ public class LabelControllerTest {
                 .andExpect(status().isNoContent());
 
         var maybeLabel = repository.findById(id).orElse(null);
-        assertNull(maybeLabel);
+        assertThat(maybeLabel).isNull();
     }
 
 }

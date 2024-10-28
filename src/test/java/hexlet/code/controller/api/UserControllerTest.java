@@ -26,8 +26,6 @@ import org.springframework.security.test.web.servlet
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -102,7 +100,7 @@ class UserControllerTest {
 		List<UserDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
 		assertThatJson(body).isArray();
-		assertTrue(actual.stream().allMatch(u -> userRepository.findById(u.getId()).isPresent()));
+		assertThat(actual.stream().allMatch(u -> userRepository.findById(u.getId()).isPresent())).isTrue();
 	}
 
 
@@ -168,7 +166,7 @@ class UserControllerTest {
 				.andExpect(status().isBadRequest());
 		var testUser = userRepository.findByEmail(dto.getEmail()).orElse(null);
 
-		assertNull(testUser);
+		assertThat(testUser).isNull();
 	}
 
 	@Test

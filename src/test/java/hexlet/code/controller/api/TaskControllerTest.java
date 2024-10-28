@@ -25,7 +25,6 @@ import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -79,7 +78,7 @@ class TaskControllerTest {
 		List<TaskDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
 		assertThatJson(body).isArray();
-		assertTrue(actual.stream().allMatch(t -> taskRepository.findById(t.getId()).isPresent()));
+		assertThat(actual.stream().allMatch(t -> taskRepository.findById(t.getId()).isPresent())).isTrue();
 	}
 
 	@Test
@@ -117,7 +116,7 @@ class TaskControllerTest {
 		List<TaskDTO> actual = objectMapper.readValue(body, new TypeReference<>() { });
 
 		assertThatJson(body).isArray();
-		assertTrue(actual.stream().allMatch(t -> taskIds.contains(t.getId())));
+		assertThat(actual.stream().allMatch(t -> taskIds.contains(t.getId()))).isTrue();
 	}
 
 	@Test
