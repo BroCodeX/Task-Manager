@@ -5,7 +5,12 @@ import hexlet.code.app.dto.user.UserDTO;
 import hexlet.code.app.dto.user.UserUpdateDTO;
 import hexlet.code.app.model.User;
 
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.BeforeMapping;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,7 +37,7 @@ public abstract class UserMapper {
 
     @BeforeMapping // Marks a method to be invoked at the beginning of a generated mapping method.
     public void toHashPass(UserCreateDTO dto) {
-        if(dto.getPassword() != null && !dto.getPassword().isBlank()) {
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             var encodedPass = passwordEncoder.encode(dto.getPassword());
             dto.setPassword(encodedPass);
         }
@@ -40,7 +45,7 @@ public abstract class UserMapper {
 
     @BeforeMapping
     public void toHashPass(UserUpdateDTO dto) {
-        if(dto.getPassword() != null && dto.getPassword().isPresent()) {
+        if (dto.getPassword() != null && dto.getPassword().isPresent()) {
             var encodedPass = passwordEncoder.encode(dto.getPassword().get());
             dto.setPassword(JsonNullable.of(encodedPass));
         }

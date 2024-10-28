@@ -58,7 +58,7 @@ public class InitData implements ApplicationRunner {
         user.setEmail("hexlet@example.com");
         user.setPassword("qwerty");
         var isUserPresent = userRepository.findByEmail(user.getEmail()).isEmpty();
-        if(isUserPresent) {
+        if (isUserPresent) {
             userRepository.save(user);
         }
         var hexletUser = userRepository.findByEmail("hexlet@example.com").get();
