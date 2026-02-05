@@ -56,7 +56,7 @@ public class InitData implements ApplicationRunner {
     private void initUser() {
         User user = new User();
         user.setEmail("hexlet@example.com");
-        user.setPassword("qwerty");
+        user.setPassword(passwordEncoder.encode("qwerty"));
         var isUserPresent = userRepository.findByEmail(user.getEmail()).isEmpty();
         if (isUserPresent) {
             userRepository.save(user);

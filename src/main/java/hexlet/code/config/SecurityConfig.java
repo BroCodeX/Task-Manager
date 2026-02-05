@@ -58,8 +58,10 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .build();
+        var authManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authManagerBuilder.userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder);
+        return authManagerBuilder.build();
     }
 
     @Bean
@@ -70,3 +72,4 @@ public class SecurityConfig {
         return provider;
     }
 }
+
