@@ -69,23 +69,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.REGISTRY_TOKEN }}
 
-      - name: Set Image Name
-        shell: bash
-        run: |
-          TAG="${{ github.ref_name }}-${{ env.APP_NAME }}-latest"
-          IMAGE_ID=$(echo "${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.APP_NAME }}" | tr '[A-Z]' '[a-z]')
-          echo "FULL_IMAGE_NAME=${IMAGE_ID}:${TAG}" >> $GITHUB_ENV
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.APP_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ env.FULL_IMAGE_NAME }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           secrets: |
             "sentry_token=${{ secrets.SENTRY_AUTH_TOKEN }}"
           build-args: |
             ENABLE_SENTRY=false
-
-      - name: Output Image Name (Raw format)
-        run: echo "${{ env.FULL_IMAGE_NAME }}"
