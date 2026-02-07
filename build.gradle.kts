@@ -126,14 +126,16 @@ tasks.checkstyleTest {
 		html.required.set(true)
 	}
 }
+var enableSentry = project.hasProperty("enableSentry")
 
-if(System.getenv("SPRING_PROFILES_ACTIVE") != null
-	&& System.getenv("SPRING_PROFILES_ACTIVE").equals("prod")) {
+if(enableSentry) {
+	var token = System.getenv("SENTRY_AUTH_TOKEN")
+		?: throw GradleException("SENTRY_AUTH_TOKEN is required but not set")
+
 	sentry {
 		includeSourceContext = true
-
-		org = "brocodex"
-		projectName = "java-spring-boot"
-		authToken = System.getenv("SENTRY_AUTH_TOKEN")
+		org.set("brocodex")
+		projectName.set("java-spring-boot")
+		authToken.set(token)
 	}
 }

@@ -3,15 +3,18 @@ WORKDIR /app
 
 COPY build.gradle.kts settings.gradle.kts ./
 COPY gradle ./gradle
+
+RUN gradle dependencies --no-daemon
+
 COPY src ./src
 
+ARG ENABLE_SENTRY=false
 ARG SENTRY_AUTH_TOKEN
-ARG SPRING_PROFILES_ACTIVE
-
-ENV SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
-
-RUN gradle bootJar --no-daemon
+RUN if [ "$ENABLE_SENTRY" = "true" ]; then \
+      SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN gradle bootJar -PenableSentry --no-daemon ; \
+    else \
+      gradle bootJar --no-daemon ; \
+    fi
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
