@@ -10,8 +10,9 @@ COPY src ./src
 
 ARG ENABLE_SENTRY=false
 ARG SENTRY_AUTH_TOKEN
-RUN if [ "$ENABLE_SENTRY" = "true" ]; then \
-      SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN gradle bootJar -PenableSentry --no-daemon ; \
+RUN --mount=type=secret,id=sentry_token \
+    if [ "$ENABLE_SENTRY" = "true" ]; then \
+      SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_token) gradle bootJar -PenableSentry --no-daemon ; \
     else \
       gradle bootJar --no-daemon ; \
     fi
